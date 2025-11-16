@@ -1,0 +1,52 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "QR Menu SaaS Backend API",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --clear-screen=false src/server.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/server.js",
+    "type-check": "tsc --noEmit",
+    "db:migrate": "prisma migrate deploy",
+    "db:migrate:dev": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "express": "latest",
+    "cors": "latest",
+    "helmet": "latest",
+    "compression": "latest",
+    "prisma": "latest",
+    "@prisma/client": "latest",
+    "bcryptjs": "latest",
+    "jsonwebtoken": "latest",
+    "zod": "latest",
+    "dotenv": "latest",
+    "qrcode": "latest",
+    "morgan": "latest",
+    "winston": "latest",
+    "winston-daily-rotate-file": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "tsx": "latest",
+    "tsc-alias": "latest",
+    "@types/node": "latest",
+    "@types/express": "latest",
+    "@types/cors": "latest",
+    "@types/compression": "latest",
+    "@types/jsonwebtoken": "latest",
+    "@types/qrcode": "latest",
+    "@types/morgan": "latest",
+    "@types/bcryptjs": "latest",
+    "@biomejs/biome": "latest"
+  },
+  "author": "",
+  "license": "MIT"
+}

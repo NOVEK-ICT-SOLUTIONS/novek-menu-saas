@@ -1,0 +1,113 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.3.5/schema.json",
+  "files": {
+    "includes": [
+      "packages/**",
+      "package.json",
+      "biome.jsonc",
+      "tsconfig.json",
+      "!node_modules/**",
+      "!packages/**/*/node_modules/**",
+      "!dist/**",
+      "!packages/**/*/dist/**"
+    ],
+    "ignoreUnknown": true
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  },
+  "graphql": {
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "javascript": {
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    }
+  },
+  "json": {
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": false
+    },
+    "parser": {
+      "allowComments": true
+    }
+  },
+  "css": {
+    "formatter": {
+      "enabled": true
+    },
+    "linter": {
+      "enabled": true
+    },
+    "parser": {
+      "cssModules": true
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "style": {
+        "noDefaultExport": "off",
+        "useNamingConvention": {
+          "options": {
+            "strictCase": false,
+            "requireAscii": true
+          }
+        },
+        "useFilenamingConvention": {
+          "options": {
+            "strictCase": true,
+            "requireAscii": true,
+            "filenameCases": ["snake_case"]
+          }
+        },
+        "useTemplate": "error"
+      },
+      "a11y": {
+        "noStaticElementInteractions": "off",
+        "useSemanticElements": "off"
+      },
+      "correctness": {
+        "noNodejsModules": "off",
+        "noUndeclaredDependencies": "off",
+        "useUniqueElementIds": "off",
+        "useParseIntRadix": "error"
+      },
+      "suspicious": {
+        "noReactSpecificProps": "off",
+        "noConsole": "off",
+        "noUnknownAtRules": "off"
+      },
+      "performance": {
+        "useTopLevelRegex": "off",
+        "noNamespaceImport": "off"
+      },
+      "complexity": {
+        "noUselessFragments": "error",
+        "noUselessEmptyExport": "off",
+        "noImportantStyles": "off",
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 30
+          }
+        }
+      }
+    }
+  }
+}

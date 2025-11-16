@@ -1,0 +1,64 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# IDEs and editors
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.vscode/settings.json
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Prisma
+prisma/generated/
+
+# Uploads
+uploads/
+qr-codes/
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+.cache/
+.parcel-cache/
+.turbo/

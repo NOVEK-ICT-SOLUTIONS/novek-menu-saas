@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  ADMIN
+  CUSTOMER
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      UserRole @default(OWNER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  restaurants Restaurant[]
+
+  @@index([email])
+}
+
+model Restaurant {
+  id               String   @id @default(cuid())
+  ownerId          String
+  name             String
+  slug             String   @unique
+  qrCodeUrl        String?
+  location         String?
+  contactEmail     String?
+  contactPhone     String?
+  primaryColor     String   @default("#ea580c")
+  backgroundColor  String   @default("#ffffff")
+  logoUrl          String?
+  headerImageUrl   String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  menus      Menu[]
+  categories Category[]
+  qrScans    QRScan[]
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model Menu {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuItems  MenuItem[]
+
+  @@index([restaurantId])
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  menuId      String
+  categoryId  String?
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  menu     Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  @@index([menuId])
+  @@index([categoryId])
+}
+
+model Category {
+  id           String   @id @default(cuid())
+  restaurantId String
+  name         String
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuItems  MenuItem[]
+
+  @@index([restaurantId])
+}
+
+model QRScan {
+  id           String   @id @default(cuid())
+  restaurantId String
+  scannedAt    DateTime @default(now())
+  ipAddress    String?
+  userAgent    String?
+
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@index([restaurantId])
+  @@index([scannedAt])
+}
