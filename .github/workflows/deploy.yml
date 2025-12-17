@@ -73,7 +73,7 @@ jobs:
 
       - name: Copy files to VPS
         run: |
-          scp -r docker-compose.prod.yml nginx/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/menu/
+          scp -r docker-compose.prod.yml nginx/ "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/menu/"
 
       - name: Create .env file on VPS
         run: |
