@@ -69,7 +69,9 @@ volumes:
   postgres_data:
   uploads:
   certbot_webroot:
+    external: true
   certbot_certs:
+    external: true
 
 networks:
   menu-network:

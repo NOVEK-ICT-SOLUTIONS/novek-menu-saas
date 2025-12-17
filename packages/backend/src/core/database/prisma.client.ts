@@ -5,9 +5,7 @@ const LOG_LEVELS_PROD = ["error"] as const;
 
 const createPrismaClient = () => {
   return new PrismaClient({
-    log: process.env.NODE_ENV === "development"
-      ? [...LOG_LEVELS_DEV]
-      : [...LOG_LEVELS_PROD],
+    log: process.env.NODE_ENV === "development" ? [...LOG_LEVELS_DEV] : [...LOG_LEVELS_PROD],
   });
 };
 

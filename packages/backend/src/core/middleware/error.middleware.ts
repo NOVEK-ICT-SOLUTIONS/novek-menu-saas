@@ -10,12 +10,7 @@ interface ErrorResponse {
   };
 }
 
-export const errorMiddleware = (
-  err: Error,
-  _req: Request,
-  res: Response<ErrorResponse>,
-  _next: NextFunction
-) => {
+export const errorMiddleware = (err: Error, _req: Request, res: Response<ErrorResponse>, _next: NextFunction) => {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -53,9 +48,7 @@ export const errorMiddleware = (
     success: false,
     error: {
       code: "INTERNAL_ERROR",
-      message: process.env.NODE_ENV === "production"
-        ? "An unexpected error occurred"
-        : err.message,
+      message: process.env.NODE_ENV === "production" ? "An unexpected error occurred" : err.message,
     },
   });
 };

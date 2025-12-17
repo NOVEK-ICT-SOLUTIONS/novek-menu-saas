@@ -1,3 +1,5 @@
+import { tenantContext } from "../../core/context/tenant.context.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../core/errors/base.error.ts";
 import { restaurantsRepository } from "./restaurants.repository.ts";
 import type {
   CreateRestaurantRequest,
@@ -6,8 +8,6 @@ import type {
   RestaurantWithCategories,
   UpdateRestaurantRequest,
 } from "./restaurants.types.ts";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../core/errors/base.error.ts";
-import { tenantContext } from "../../core/context/tenant.context.ts";
 
 export const restaurantsService = {
   getAll: async (): Promise<RestaurantResponse[]> => {

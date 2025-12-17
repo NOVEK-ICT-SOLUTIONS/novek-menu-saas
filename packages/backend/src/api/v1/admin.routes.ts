@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { adminController } from "../../modules/admin/admin.controller.ts";
 import { authMiddleware } from "../../core/middleware/auth.middleware.ts";
 import { tenantMiddleware } from "../../core/middleware/tenant.middleware.ts";
+import { adminController } from "../../modules/admin/admin.controller.ts";
 
 export const adminRouter = Router();
 

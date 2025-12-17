@@ -4,8 +4,8 @@ import {
   type Category,
   type CategoryWithItems,
   type CreateCategoryData,
-  type UpdateCategoryData,
   categoryService,
+  type UpdateCategoryData,
 } from "../categories.service";
 
 export const categoryKeys = {

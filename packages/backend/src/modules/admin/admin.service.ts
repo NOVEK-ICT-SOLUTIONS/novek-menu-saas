@@ -1,5 +1,5 @@
-import { adminRepository } from "./admin.repository.ts";
 import type { UserRole } from "@prisma/client";
+import { adminRepository } from "./admin.repository.ts";
 
 export const adminService = {
   getAllUsers: () => {

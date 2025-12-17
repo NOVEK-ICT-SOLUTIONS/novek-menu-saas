@@ -23,7 +23,9 @@ const AdminOverviewPage = () => {
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
           <div className="text-xs md:text-sm font-medium text-gray-600">Total Users</div>
           <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.totalUsers || 0}</div>
-          <div className="text-xs text-green-600 mt-1 md:mt-2">+{stats?.newUsersThisMonth || 0} this month ({stats?.userGrowth || 0}%)</div>
+          <div className="text-xs text-green-600 mt-1 md:mt-2">
+            +{stats?.newUsersThisMonth || 0} this month ({stats?.userGrowth || 0}%)
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
@@ -54,44 +56,66 @@ const AdminOverviewPage = () => {
           <table className="w-full min-w-[600px]">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Metric</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Total</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">This Month</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Growth</th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Metric
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Total
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  This Month
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Growth
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">
               <tr className="hover:bg-gray-50">
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Users</td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalUsers || 0}</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">+{stats?.newUsersThisMonth || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
+                  +{stats?.newUsersThisMonth || 0}
+                </td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm">
                   <span className="text-green-600 font-medium">+{stats?.userGrowth || 0}%</span>
                 </td>
               </tr>
               <tr className="hover:bg-gray-50">
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">QR Code Scans</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalQRScans || 0}</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.qrScansThisMonth || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">
+                  QR Code Scans
+                </td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
+                  {stats?.totalQRScans || 0}
+                </td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
+                  {stats?.qrScansThisMonth || 0}
+                </td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm">
                   <span className="text-green-600 font-medium">+{stats?.scanGrowth || 0}%</span>
                 </td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Restaurants</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalRestaurants || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
+                  {stats?.totalRestaurants || 0}
+                </td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Categories</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalCategories || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
+                  {stats?.totalCategories || 0}
+                </td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
               </tr>
               <tr className="hover:bg-gray-50">
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Menu Items</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalMenuItems || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">
+                  {stats?.totalMenuItems || 0}
+                </td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
               </tr>

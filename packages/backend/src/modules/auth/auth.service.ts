@@ -1,8 +1,8 @@
+import { passwordService } from "../../core/auth/password.service.ts";
+import { tokenService } from "../../core/auth/token.service.ts";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../core/errors/base.error.ts";
 import { authRepository } from "./auth.repository.ts";
 import type { AuthResponse, LoginRequest, RefreshResponse, RegisterRequest } from "./auth.types.ts";
-import { ConflictError, NotFoundError, UnauthorizedError } from "../../core/errors/base.error.ts";
-import { tokenService } from "../../core/auth/token.service.ts";
-import { passwordService } from "../../core/auth/password.service.ts";
 
 export const authService = {
   register: async (data: RegisterRequest): Promise<AuthResponse> => {

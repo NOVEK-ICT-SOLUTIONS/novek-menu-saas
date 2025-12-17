@@ -1,5 +1,5 @@
-import { prisma } from "../../core/database/prisma.client.ts";
 import type { UserRole } from "@prisma/client";
+import { prisma } from "../../core/database/prisma.client.ts";
 
 export const adminRepository = {
   findAllUsers: () => {
@@ -107,8 +107,10 @@ export const adminRepository = {
     ]);
 
     const PERCENTAGE_MULTIPLIER = 100;
-    const userGrowth = newUsersLastMonth > 0 ? ((newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * PERCENTAGE_MULTIPLIER : 0;
-    const scanGrowth = qrScansLastMonth > 0 ? ((qrScansThisMonth - qrScansLastMonth) / qrScansLastMonth) * PERCENTAGE_MULTIPLIER : 0;
+    const userGrowth =
+      newUsersLastMonth > 0 ? ((newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * PERCENTAGE_MULTIPLIER : 0;
+    const scanGrowth =
+      qrScansLastMonth > 0 ? ((qrScansThisMonth - qrScansLastMonth) / qrScansLastMonth) * PERCENTAGE_MULTIPLIER : 0;
 
     const avgCategoriesPerRestaurant = totalRestaurants > 0 ? totalCategories / totalRestaurants : 0;
     const avgItemsPerCategory = totalCategories > 0 ? totalMenuItems / totalCategories : 0;

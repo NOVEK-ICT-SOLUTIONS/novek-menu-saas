@@ -8,13 +8,7 @@ const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const MAX_FILE_SIZE_MB = 2;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
-const ALLOWED_MIME_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-] as const;
+const ALLOWED_MIME_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"] as const;
 
 const ensureUploadDir = () => {
   if (!existsSync(UPLOAD_DIR)) {
@@ -36,12 +30,8 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (
-  _req: Express.Request,
-  file: Express.Multer.File,
-  cb: multer.FileFilterCallback,
-) => {
-  if (ALLOWED_MIME_TYPES.includes(file.mimetype as typeof ALLOWED_MIME_TYPES[number])) {
+const fileFilter = (_req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+  if (ALLOWED_MIME_TYPES.includes(file.mimetype as (typeof ALLOWED_MIME_TYPES)[number])) {
     cb(null, true);
   } else {
     cb(new Error(`Invalid file type. Allowed types: ${ALLOWED_MIME_TYPES.join(", ")}`));
@@ -56,8 +46,7 @@ export const upload = multer({
   },
 });
 
-export const getFileUrl = (filename: string, baseUrl: string): string =>
-  `${baseUrl}/uploads/${filename}`;
+export const getFileUrl = (filename: string, baseUrl: string): string => `${baseUrl}/uploads/${filename}`;
 
 export const deleteFile = async (filename: string): Promise<void> => {
   const filepath = path.join(UPLOAD_DIR, filename);

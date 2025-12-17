@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { authController } from "../../modules/auth/auth.controller.ts";
-import { validateBody } from "../../core/middleware/validation.middleware.ts";
-import { loginSchema, refreshTokenSchema, registerSchema } from "../../modules/auth/auth.validation.ts";
 import { authRateLimiter } from "../../core/middleware/rate-limit.middleware.ts";
+import { validateBody } from "../../core/middleware/validation.middleware.ts";
+import { authController } from "../../modules/auth/auth.controller.ts";
+import { loginSchema, refreshTokenSchema, registerSchema } from "../../modules/auth/auth.validation.ts";
 
 export const authRouter = Router();
 

@@ -16,6 +16,6 @@ export const tenantMiddleware = (req: Request, _res: Response, next: NextFunctio
     },
     async () => {
       next();
-    }
+    },
   );
 };

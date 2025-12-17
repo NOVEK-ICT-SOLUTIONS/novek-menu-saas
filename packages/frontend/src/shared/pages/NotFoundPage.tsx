@@ -15,12 +15,10 @@ const NotFoundPage = () => {
                 <MdSearchOff className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 h-24 w-24 text-orange-600" />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <h1 className="text-2xl font-bold text-gray-900">Page Not Found</h1>
-              <p className="text-gray-600">
-                The page you're looking for doesn't exist or has been moved.
-              </p>
+              <p className="text-gray-600">The page you're looking for doesn't exist or has been moved.</p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -1,3 +1,5 @@
+import { tenantContext } from "../../core/context/tenant.context.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../core/errors/base.error.ts";
 import { categoriesRepository } from "./categories.repository.ts";
 import type {
   CategoryResponse,
@@ -5,8 +7,6 @@ import type {
   CreateCategoryRequest,
   UpdateCategoryRequest,
 } from "./categories.types.ts";
-import { ConflictError, ForbiddenError, NotFoundError } from "../../core/errors/base.error.ts";
-import { tenantContext } from "../../core/context/tenant.context.ts";
 
 export const categoriesService = {
   getAllByRestaurant: async (restaurantId: string): Promise<CategoryWithItems[]> => {

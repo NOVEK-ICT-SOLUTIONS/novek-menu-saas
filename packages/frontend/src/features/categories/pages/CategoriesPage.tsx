@@ -137,7 +137,9 @@ const CategoriesPage = React.memo(
                     <Label htmlFor="isActive" className="text-sm">
                       Active Category
                     </Label>
-                    <p className="text-xs md:text-sm text-muted-foreground">Active categories are visible to customers</p>
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Active categories are visible to customers
+                    </p>
                   </div>
                   <Switch id="isActive" checked={isActive} onCheckedChange={setIsActive} />
                 </div>

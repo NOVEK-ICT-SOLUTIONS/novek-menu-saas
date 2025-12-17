@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import {
   type CreateMenuItemData,
   type MenuItem,
-  type UpdateMenuItemData,
   menuItemService,
+  type UpdateMenuItemData,
 } from "../menu-items.service";
 
 export const menuItemKeys = {

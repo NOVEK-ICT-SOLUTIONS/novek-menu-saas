@@ -1,6 +1,6 @@
+import type { UserRole } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import { adminService } from "./admin.service.ts";
-import type { UserRole } from "@prisma/client";
 
 const HTTP_STATUS_OK = 200;
 const HTTP_STATUS_NOT_FOUND = 404;

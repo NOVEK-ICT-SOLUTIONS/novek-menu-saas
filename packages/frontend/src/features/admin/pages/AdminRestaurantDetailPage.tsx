@@ -90,11 +90,15 @@ const AdminRestaurantDetailPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div>
             <div className="text-xs md:text-sm font-medium text-gray-600">Slug</div>
-            <code className="text-xs md:text-sm bg-gray-100 px-2 py-1 rounded mt-1 inline-block">{restaurant.slug}</code>
+            <code className="text-xs md:text-sm bg-gray-100 px-2 py-1 rounded mt-1 inline-block">
+              {restaurant.slug}
+            </code>
           </div>
           <div>
             <div className="text-xs md:text-sm font-medium text-gray-600">Restaurant ID</div>
-            <code className="text-xs md:text-sm bg-gray-100 px-2 py-1 rounded mt-1 inline-block break-all">{restaurant.id}</code>
+            <code className="text-xs md:text-sm bg-gray-100 px-2 py-1 rounded mt-1 inline-block break-all">
+              {restaurant.id}
+            </code>
           </div>
           <div>
             <div className="text-xs md:text-sm font-medium text-gray-600">Created Date</div>
@@ -139,10 +143,18 @@ const AdminRestaurantDetailPage = () => {
           <table className="w-full min-w-[500px]">
             <thead className="bg-gray-50 border-b">
               <tr>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Name</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Items</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Status</th>
-                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">Sort Order</th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Name
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Items
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Status
+                </th>
+                <th className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                  Sort Order
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y">

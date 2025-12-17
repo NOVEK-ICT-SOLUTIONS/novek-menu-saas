@@ -201,15 +201,17 @@ const CustomerMenuPage = React.memo(
                   <h2 className="text-lg font-bold" style={{ color: primaryColor }}>
                     {category.name}
                   </h2>
-                  {category.description && (
-                    <p className="text-xs text-gray-500 mt-0.5">{category.description}</p>
-                  )}
+                  {category.description && <p className="text-xs text-gray-500 mt-0.5">{category.description}</p>}
                 </div>
                 <div className="space-y-2">
                   {availableItems.map((item: MenuItem) => (
                     <div key={item.id} className="bg-white rounded-lg p-3 flex gap-3 shadow-sm">
                       {item.imageUrl && (
-                        <img src={item.imageUrl} alt={item.name} className="h-16 w-16 rounded-lg object-cover shrink-0" />
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          className="h-16 w-16 rounded-lg object-cover shrink-0"
+                        />
                       )}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-sm font-semibold text-gray-900 mb-1 line-clamp-1">{item.name}</h3>

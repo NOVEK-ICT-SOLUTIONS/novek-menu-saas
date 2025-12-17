@@ -121,11 +121,15 @@ const AdminUsersPage = () => {
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
           <div className="text-xs md:text-sm font-medium text-gray-600">Admins</div>
-          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{users?.filter((u) => u.role === "ADMIN").length || 0}</div>
+          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">
+            {users?.filter((u) => u.role === "ADMIN").length || 0}
+          </div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
           <div className="text-xs md:text-sm font-medium text-gray-600">Owners</div>
-          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{users?.filter((u) => u.role === "OWNER").length || 0}</div>
+          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">
+            {users?.filter((u) => u.role === "OWNER").length || 0}
+          </div>
         </div>
       </div>
 
@@ -153,7 +157,10 @@ const AdminUsersPage = () => {
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
-                    <th key={header.id} className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900">
+                    <th
+                      key={header.id}
+                      className="px-3 md:px-6 py-3 md:py-4 text-left text-xs md:text-sm font-semibold text-gray-900"
+                    >
                       {flexRender(header.column.columnDef.header, header.getContext())}
                     </th>
                   ))}

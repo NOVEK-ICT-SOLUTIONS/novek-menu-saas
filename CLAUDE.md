@@ -1,5 +1,11 @@
 # AI AGENT RULES
 
+## GIT COMMIT RULES
+
+- NEVER add co-authored-by or AI attribution to commit messages.
+- ALWAYS use single-line commit messages (no multi-line descriptions).
+- Commit format: `<type>: <short description>` (e.g., `fix: resolve SSL cert volume mounting`)
+
 ## EXCLUDED FILES
 
 NEVER scan files matching the following directory/file patterns:

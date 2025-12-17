@@ -6,7 +6,7 @@ export const cacheMiddleware = (maxAge = DEFAULT_PUBLIC_CACHE_MAX_AGE_SECONDS) =
   return (_req: Request, res: Response, next: NextFunction) => {
     res.set({
       "Cache-Control": `public, max-age=${maxAge}`,
-      "Vary": "Accept-Encoding",
+      Vary: "Accept-Encoding",
     });
     next();
   };
@@ -16,8 +16,8 @@ export const privateCacheMiddleware = () => {
   return (_req: Request, res: Response, next: NextFunction) => {
     res.set({
       "Cache-Control": "private, no-cache, no-store, must-revalidate",
-      "Pragma": "no-cache",
-      "Expires": "0",
+      Pragma: "no-cache",
+      Expires: "0",
     });
     next();
   };
@@ -27,7 +27,7 @@ export const noCacheMiddleware = () => {
   return (_req: Request, res: Response, next: NextFunction) => {
     res.set({
       "Cache-Control": "no-store",
-      "Pragma": "no-cache",
+      Pragma: "no-cache",
     });
     next();
   };

@@ -33,7 +33,9 @@ const AdminRestaurantStatsPage = () => {
     <div className="p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">Restaurant Performance</h1>
-        <p className="text-sm md:text-base text-muted-foreground">Detailed QR scan analytics and engagement metrics per restaurant</p>
+        <p className="text-sm md:text-base text-muted-foreground">
+          Detailed QR scan analytics and engagement metrics per restaurant
+        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -93,8 +95,8 @@ const AdminRestaurantStatsPage = () => {
               %
             </div>
             <p className="text-xs text-muted-foreground">
-              {restaurants ? restaurants.filter((r) => r.scansThisMonth > 0).length : 0}/{restaurants?.length || 0} active
-              this month
+              {restaurants ? restaurants.filter((r) => r.scansThisMonth > 0).length : 0}/{restaurants?.length || 0}{" "}
+              active this month
             </p>
           </CardContent>
         </Card>
@@ -114,7 +116,9 @@ const AdminRestaurantStatsPage = () => {
                     <thead>
                       <tr className="border-b bg-muted/50">
                         <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium">Restaurant</th>
-                        <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium hidden md:table-cell">Owner</th>
+                        <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium hidden md:table-cell">
+                          Owner
+                        </th>
                         <th className="p-2 md:p-3 text-center text-xs md:text-sm font-medium">
                           <div className="flex items-center justify-center gap-1">
                             <MdCategory className="h-3 w-3 md:h-4 md:w-4" />
@@ -150,10 +154,14 @@ const AdminRestaurantStatsPage = () => {
                               <div className="text-xs text-muted-foreground">/{restaurant.slug}</div>
                             </div>
                           </td>
-                          <td className="p-2 md:p-3 text-xs md:text-sm text-muted-foreground hidden md:table-cell">{restaurant.ownerEmail}</td>
+                          <td className="p-2 md:p-3 text-xs md:text-sm text-muted-foreground hidden md:table-cell">
+                            {restaurant.ownerEmail}
+                          </td>
                           <td className="p-2 md:p-3 text-center text-xs md:text-sm">{restaurant.totalCategories}</td>
                           <td className="p-2 md:p-3 text-center text-xs md:text-sm">{restaurant.totalMenuItems}</td>
-                          <td className="p-2 md:p-3 text-center text-xs md:text-sm font-medium">{restaurant.totalScans}</td>
+                          <td className="p-2 md:p-3 text-center text-xs md:text-sm font-medium">
+                            {restaurant.totalScans}
+                          </td>
                           <td className="p-2 md:p-3 text-center">
                             <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">
                               {restaurant.scansThisMonth}

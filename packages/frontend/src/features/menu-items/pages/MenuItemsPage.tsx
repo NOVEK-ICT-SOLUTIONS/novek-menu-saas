@@ -83,7 +83,14 @@ const MenuItemsPage = React.memo(
     );
 
     const handleEdit = React.useCallback(
-      (item: { id: string; name: string; description: string | null; price: number; imageUrl: string | null; isAvailable: boolean }) => {
+      (item: {
+        id: string;
+        name: string;
+        description: string | null;
+        price: number;
+        imageUrl: string | null;
+        isAvailable: boolean;
+      }) => {
         setEditingItem(item.id);
         setFormData({
           name: item.name,
@@ -113,12 +120,9 @@ const MenuItemsPage = React.memo(
       setFormData(INITIAL_FORM_DATA);
     }, []);
 
-    const updateField = React.useCallback(
-      <K extends keyof FormData>(field: K, value: FormData[K]) => {
-        setFormData((prev) => ({ ...prev, [field]: value }));
-      },
-      [],
-    );
+    const updateField = React.useCallback(<K extends keyof FormData>(field: K, value: FormData[K]) => {
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    }, []);
 
     return (
       <div className="flex-1 space-y-3 md:space-y-4 p-3 md:p-8 pt-4 md:pt-6">
@@ -128,9 +132,7 @@ const MenuItemsPage = React.memo(
               <Button variant="ghost" size="icon" onClick={handleBack} className="h-8 w-8 md:h-10 md:w-10">
                 <MdArrowBack className="h-4 w-4 md:h-5 md:w-5" />
               </Button>
-              <h2 className="text-xl md:text-3xl font-bold tracking-tight">
-                {category?.name || "Menu Items"}
-              </h2>
+              <h2 className="text-xl md:text-3xl font-bold tracking-tight">{category?.name || "Menu Items"}</h2>
             </div>
             <p className="text-xs md:text-sm text-muted-foreground">
               Add and manage items for this category with prices and descriptions.
@@ -153,7 +155,9 @@ const MenuItemsPage = React.memo(
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm">Item Name</Label>
+                  <Label htmlFor="name" className="text-sm">
+                    Item Name
+                  </Label>
                   <Input
                     id="name"
                     className="text-sm md:text-base"
@@ -164,7 +168,9 @@ const MenuItemsPage = React.memo(
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm">Description</Label>
+                  <Label htmlFor="description" className="text-sm">
+                    Description
+                  </Label>
                   <Textarea
                     id="description"
                     className="text-sm md:text-base"
@@ -183,7 +189,9 @@ const MenuItemsPage = React.memo(
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="price" className="text-sm">Price ($)</Label>
+                  <Label htmlFor="price" className="text-sm">
+                    Price ($)
+                  </Label>
                   <Input
                     id="price"
                     className="text-sm md:text-base"
@@ -198,8 +206,12 @@ const MenuItemsPage = React.memo(
                 </div>
                 <div className="flex items-center justify-between rounded-lg border p-3 md:p-4">
                   <div className="space-y-0.5">
-                    <Label htmlFor="isAvailable" className="text-sm">Available</Label>
-                    <p className="text-xs md:text-sm text-muted-foreground">Item is visible and available to customers</p>
+                    <Label htmlFor="isAvailable" className="text-sm">
+                      Available
+                    </Label>
+                    <p className="text-xs md:text-sm text-muted-foreground">
+                      Item is visible and available to customers
+                    </p>
                   </div>
                   <Switch
                     id="isAvailable"
@@ -245,7 +257,9 @@ const MenuItemsPage = React.memo(
                 <MdFastfood className="h-4 w-4 md:h-5 md:w-5" />
                 All Menu Items
               </CardTitle>
-              <CardDescription className="text-xs md:text-sm">{menuItems.length} items in this category</CardDescription>
+              <CardDescription className="text-xs md:text-sm">
+                {menuItems.length} items in this category
+              </CardDescription>
             </CardHeader>
             <CardContent className="p-0 md:p-6">
               <div className="md:hidden space-y-2 p-3">
@@ -253,11 +267,17 @@ const MenuItemsPage = React.memo(
                   <div key={item.id} className="border rounded-lg p-3 space-y-2">
                     <div className="flex gap-3">
                       {item.imageUrl && (
-                        <img src={item.imageUrl} alt={item.name} className="h-16 w-16 rounded-lg object-cover shrink-0" />
+                        <img
+                          src={item.imageUrl}
+                          alt={item.name}
+                          className="h-16 w-16 rounded-lg object-cover shrink-0"
+                        />
                       )}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-sm truncate">{item.name}</h3>
-                        {item.description && <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>}
+                        {item.description && (
+                          <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                        )}
                         <span className="font-medium text-sm">{item.price.toFixed(2)} Birr</span>
                       </div>
                     </div>

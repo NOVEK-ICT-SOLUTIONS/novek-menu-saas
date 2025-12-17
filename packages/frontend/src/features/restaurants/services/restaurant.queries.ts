@@ -48,8 +48,7 @@ export const useUpdateRestaurant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: RestaurantFormData }) =>
-      restaurantService.update(id, data),
+    mutationFn: ({ id, data }: { id: string; data: RestaurantFormData }) => restaurantService.update(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: restaurantKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: restaurantKeys.lists() });

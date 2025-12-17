@@ -1,5 +1,5 @@
-import { prisma } from "../../core/database/prisma.client.ts";
 import type { UserRole } from "@prisma/client";
+import { prisma } from "../../core/database/prisma.client.ts";
 
 const DEFAULT_USER_ROLE: UserRole = "OWNER";
 

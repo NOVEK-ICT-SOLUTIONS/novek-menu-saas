@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { UnauthorizedError, ForbiddenError } from "../errors/base.error.ts";
+import { ForbiddenError, UnauthorizedError } from "../errors/base.error.ts";
 
 interface TokenPayload {
   userId: string;
