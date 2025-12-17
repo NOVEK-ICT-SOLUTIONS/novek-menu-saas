@@ -17,7 +17,7 @@ COPY packages/backend ./packages/backend
 COPY tsconfig.json ./
 
 WORKDIR /app/packages/backend
-RUN npx prisma generate
+RUN DATABASE_URL="postgresql://user:pass@localhost:5432/db" npx prisma generate
 RUN npm run build
 
 FROM base AS runner

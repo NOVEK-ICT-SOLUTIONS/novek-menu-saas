@@ -53,7 +53,7 @@ prisma/generated/
 
 # Uploads
 uploads/
-qr-codes/
+/qr-codes/
 
 # TypeScript
 *.tsbuildinfo
