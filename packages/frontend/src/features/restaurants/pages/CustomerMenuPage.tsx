@@ -217,7 +217,7 @@ const CustomerMenuPage = React.memo(
                           <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
                         )}
                         <div className="text-base font-bold" style={{ color: primaryColor }}>
-                          ${item.price.toFixed(2)}
+                          {item.price.toFixed(2)} Birr
                         </div>
                       </div>
                     </div>

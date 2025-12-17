@@ -1,4 +1,4 @@
-import { Activity, BarChart3, FileText, Users } from "lucide-react";
+import { Activity, BarChart3, Users } from "lucide-react";
 import type * as React from "react";
 import { MdDashboard, MdQrCode2, MdRestaurant, MdSettings } from "react-icons/md";
 import { Link, useLocation } from "react-router-dom";
@@ -62,11 +62,6 @@ const adminNavItems = [
     title: "Restaurant Stats",
     url: "/admin/restaurant-stats",
     icon: MdQrCode2,
-  },
-  {
-    title: "Menus",
-    url: "/admin/menus",
-    icon: FileText,
   },
   {
     title: "Activity Logs",

@@ -39,14 +39,6 @@ const AdminRestaurantsPage = () => {
       header: "Slug",
       cell: (info) => <code className="text-xs bg-gray-100 px-2 py-1 rounded">{info.getValue()}</code>,
     }),
-    columnHelper.accessor("owner.email", {
-      header: "Owner",
-      cell: (info) => <span className="text-sm">{info.getValue()}</span>,
-    }),
-    columnHelper.accessor("_count.menus", {
-      header: "Menus",
-      cell: (info) => <span className="text-sm">{info.getValue()}</span>,
-    }),
     columnHelper.accessor("_count.categories", {
       header: "Categories",
       cell: (info) => <span className="text-sm">{info.getValue()}</span>,
@@ -73,7 +65,7 @@ const AdminRestaurantsPage = () => {
           className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-white bg-orange-600 hover:bg-orange-700 rounded-lg transition-colors"
         >
           <Eye className="h-4 w-4" />
-          View Details
+          View
         </button>
       ),
     }),
@@ -114,7 +106,7 @@ const AdminRestaurantsPage = () => {
           <p className="text-gray-600">{error?.message || "An unexpected error occurred"}</p>
           <button
             type="button"
-            onClick={() => window.location.reload()}
+            onClick={() => globalThis.location.reload()}
             className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
           >
             Retry
@@ -144,12 +136,12 @@ const AdminRestaurantsPage = () => {
             <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats.withQrCodes}</div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
-            <div className="text-xs md:text-sm font-medium text-gray-600">Total Menus</div>
-            <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats.totalMenus}</div>
+            <div className="text-xs md:text-sm font-medium text-gray-600">Total Categories</div>
+            <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats.totalCategories}</div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
-            <div className="text-xs md:text-sm font-medium text-gray-600">Avg Menus/Restaurant</div>
-            <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats.avgMenusPerRestaurant}</div>
+            <div className="text-xs md:text-sm font-medium text-gray-600">Avg Categories/Restaurant</div>
+            <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats.avgCategoriesPerRestaurant}</div>
           </div>
         </div>
       )}
@@ -172,7 +164,7 @@ const AdminRestaurantsPage = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[800px]">
+          <table className="w-full min-w-[600px]">
             <thead className="bg-gray-50 border-b">
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>

@@ -14,6 +14,16 @@ export interface RestaurantListItem {
   };
 }
 
+export interface CategoryDetail {
+  id: string;
+  name: string;
+  isActive: boolean;
+  sortOrder: number;
+  _count: {
+    items: number;
+  };
+}
+
 export interface RestaurantDetail {
   id: string;
   name: string;
@@ -22,15 +32,7 @@ export interface RestaurantDetail {
   ownerId: string;
   createdAt: string;
   updatedAt: string;
-  categories: Array<{
-    id: string;
-    name: string;
-    isActive: boolean;
-    sortOrder: number;
-    _count: {
-      items: number;
-    };
-  }>;
+  categories: CategoryDetail[];
 }
 
 export interface RestaurantsListResponse {
@@ -44,12 +46,12 @@ export interface RestaurantDetailResponse {
 const BASE_PATH = "/admin/restaurants";
 
 export const AdminRestaurantsApi = {
-  getAll: async (): Promise<RestaurantListItem[]> => {
+  getAllRestaurants: async (): Promise<RestaurantListItem[]> => {
     const response = await apiClient.get<ApiResponse<RestaurantsListResponse>>(BASE_PATH);
     return response.data.data.restaurants;
   },
 
-  getById: async (restaurantId: string): Promise<RestaurantDetail> => {
+  getRestaurantById: async (restaurantId: string): Promise<RestaurantDetail> => {
     const response = await apiClient.get<ApiResponse<RestaurantDetailResponse>>(`${BASE_PATH}/${restaurantId}`);
     return response.data.data.restaurant;
   },

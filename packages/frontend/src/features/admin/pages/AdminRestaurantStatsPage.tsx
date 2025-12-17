@@ -1,4 +1,4 @@
-import { MdFastfood, MdMenuBook, MdQrCode2, MdRestaurant, MdTrendingUp } from "react-icons/md";
+import { MdCategory, MdFastfood, MdQrCode2, MdRestaurant, MdTrendingUp } from "react-icons/md";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRestaurantStats } from "../services/admin.queries";
@@ -36,7 +36,6 @@ const AdminRestaurantStatsPage = () => {
         <p className="text-sm md:text-base text-muted-foreground">Detailed QR scan analytics and engagement metrics per restaurant</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -71,7 +70,7 @@ const AdminRestaurantStatsPage = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Avg Monthly Scans</CardTitle>
-            <MdMenuBook className="h-5 w-5 text-blue-600" />
+            <MdCategory className="h-5 w-5 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -101,7 +100,6 @@ const AdminRestaurantStatsPage = () => {
         </Card>
       </div>
 
-      {/* Restaurant List */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">Restaurant Performance</CardTitle>
@@ -119,8 +117,8 @@ const AdminRestaurantStatsPage = () => {
                         <th className="p-2 md:p-3 text-left text-xs md:text-sm font-medium hidden md:table-cell">Owner</th>
                         <th className="p-2 md:p-3 text-center text-xs md:text-sm font-medium">
                           <div className="flex items-center justify-center gap-1">
-                            <MdMenuBook className="h-3 w-3 md:h-4 md:w-4" />
-                            <span className="hidden sm:inline">Menus</span>
+                            <MdCategory className="h-3 w-3 md:h-4 md:w-4" />
+                            <span className="hidden sm:inline">Categories</span>
                           </div>
                         </th>
                         <th className="p-2 md:p-3 text-center text-xs md:text-sm font-medium">
@@ -153,7 +151,7 @@ const AdminRestaurantStatsPage = () => {
                             </div>
                           </td>
                           <td className="p-2 md:p-3 text-xs md:text-sm text-muted-foreground hidden md:table-cell">{restaurant.ownerEmail}</td>
-                          <td className="p-2 md:p-3 text-center text-xs md:text-sm">{restaurant.totalMenus}</td>
+                          <td className="p-2 md:p-3 text-center text-xs md:text-sm">{restaurant.totalCategories}</td>
                           <td className="p-2 md:p-3 text-center text-xs md:text-sm">{restaurant.totalMenuItems}</td>
                           <td className="p-2 md:p-3 text-center text-xs md:text-sm font-medium">{restaurant.totalScans}</td>
                           <td className="p-2 md:p-3 text-center">

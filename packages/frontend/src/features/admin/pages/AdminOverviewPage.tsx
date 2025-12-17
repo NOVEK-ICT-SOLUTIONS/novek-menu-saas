@@ -19,7 +19,6 @@ const AdminOverviewPage = () => {
         <p className="text-sm md:text-base text-gray-600 mt-1 md:mt-2">System statistics and performance metrics</p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
           <div className="text-xs md:text-sm font-medium text-gray-600">Total Users</div>
@@ -30,7 +29,7 @@ const AdminOverviewPage = () => {
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
           <div className="text-xs md:text-sm font-medium text-gray-600">Total Restaurants</div>
           <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.totalRestaurants || 0}</div>
-          <div className="text-xs text-gray-500 mt-1 md:mt-2">{stats?.totalMenus || 0} menus created</div>
+          <div className="text-xs text-gray-500 mt-1 md:mt-2">{stats?.totalCategories || 0} categories created</div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
@@ -40,13 +39,12 @@ const AdminOverviewPage = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-gray-600">Active Menus</div>
-          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.activeMenus || 0}</div>
+          <div className="text-xs md:text-sm font-medium text-gray-600">Active Categories</div>
+          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.activeCategories || 0}</div>
           <div className="text-xs text-gray-500 mt-1 md:mt-2">{stats?.totalMenuItems || 0} total items</div>
         </div>
       </div>
 
-      {/* Growth Trends */}
       <div className="bg-white rounded-xl shadow-sm border">
         <div className="p-4 md:p-6 border-b">
           <h2 className="text-lg md:text-xl font-semibold">Growth & Engagement Trends</h2>
@@ -86,8 +84,14 @@ const AdminOverviewPage = () => {
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
               </tr>
               <tr className="hover:bg-gray-50">
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Active Menus</td>
-                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.activeMenus || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Categories</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalCategories || 0}</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
+              </tr>
+              <tr className="hover:bg-gray-50">
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm font-medium text-gray-900">Menu Items</td>
+                <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-600">{stats?.totalMenuItems || 0}</td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
                 <td className="px-3 md:px-6 py-3 md:py-4 text-xs md:text-sm text-gray-500">-</td>
               </tr>
@@ -96,30 +100,24 @@ const AdminOverviewPage = () => {
         </div>
       </div>
 
-      {/* Platform Averages */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-gray-600">Avg Menus/Restaurant</div>
-          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.avgMenusPerRestaurant || 0}</div>
+          <div className="text-xs md:text-sm font-medium text-gray-600">Avg Categories/Restaurant</div>
+          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.avgCategoriesPerRestaurant || 0}</div>
           <div className="text-xs text-gray-500 mt-1 md:mt-2">Platform average</div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
-          <div className="text-xs md:text-sm font-medium text-gray-600">Avg Items/Menu</div>
-          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.avgItemsPerMenu || 0}</div>
+          <div className="text-xs md:text-sm font-medium text-gray-600">Avg Items/Category</div>
+          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.avgItemsPerCategory || 0}</div>
           <div className="text-xs text-gray-500 mt-1 md:mt-2">Platform average</div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
           <div className="text-xs md:text-sm font-medium text-gray-600">Avg Scans/Restaurant</div>
-          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">
-            {stats?.totalRestaurants && stats?.totalRestaurants > 0
-              ? Math.round((stats?.totalQRScans || 0) / stats.totalRestaurants)
-              : 0}
-          </div>
+          <div className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{stats?.avgScansPerRestaurant || 0}</div>
           <div className="text-xs text-gray-500 mt-1 md:mt-2">Platform average</div>
         </div>
       </div>
 
-      {/* System Health */}
       <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
         <h2 className="text-lg md:text-xl font-semibold mb-4">System Health</h2>
         <div className="space-y-3 md:space-y-4">

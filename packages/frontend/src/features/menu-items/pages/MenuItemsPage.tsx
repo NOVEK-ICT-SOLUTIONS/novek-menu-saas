@@ -1,6 +1,7 @@
 import React from "react";
 import { MdAdd, MdArrowBack, MdDelete, MdEdit, MdFastfood } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
+import { ImageUpload } from "@/components/image-upload";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -174,14 +175,11 @@ const MenuItemsPage = React.memo(
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="imageUrl" className="text-sm">Image URL (optional)</Label>
-                  <Input
-                    id="imageUrl"
-                    className="text-sm md:text-base"
-                    type="url"
-                    placeholder="https://example.com/image.jpg"
-                    value={formData.imageUrl}
-                    onChange={(e) => updateField("imageUrl", e.target.value)}
+                  <Label className="text-sm">Image (optional)</Label>
+                  <ImageUpload
+                    value={formData.imageUrl || undefined}
+                    onChange={(url) => updateField("imageUrl", url || "")}
+                    disabled={createMenuItem.isPending || updateMenuItem.isPending}
                   />
                 </div>
                 <div className="space-y-2">
@@ -253,13 +251,16 @@ const MenuItemsPage = React.memo(
               <div className="md:hidden space-y-2 p-3">
                 {menuItems.map((item) => (
                   <div key={item.id} className="border rounded-lg p-3 space-y-2">
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex gap-3">
+                      {item.imageUrl && (
+                        <img src={item.imageUrl} alt={item.name} className="h-16 w-16 rounded-lg object-cover shrink-0" />
+                      )}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-sm truncate">{item.name}</h3>
+                        {item.description && <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>}
+                        <span className="font-medium text-sm">{item.price.toFixed(2)} Birr</span>
                       </div>
-                      <span className="font-medium text-sm whitespace-nowrap">${item.price.toFixed(2)}</span>
                     </div>
-                    {item.description && <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>}
                     <div className="flex items-center justify-between pt-1">
                       <Badge variant={item.isAvailable ? "default" : "secondary"} className="text-xs">
                         {item.isAvailable ? "Available" : "Unavailable"}
@@ -285,6 +286,7 @@ const MenuItemsPage = React.memo(
               <Table className="hidden md:table">
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-16">Image</TableHead>
                     <TableHead>Name</TableHead>
                     <TableHead>Description</TableHead>
                     <TableHead className="text-right">Price</TableHead>
@@ -295,11 +297,20 @@ const MenuItemsPage = React.memo(
                 <TableBody>
                   {menuItems.map((item) => (
                     <TableRow key={item.id}>
+                      <TableCell>
+                        {item.imageUrl ? (
+                          <img src={item.imageUrl} alt={item.name} className="h-12 w-12 rounded-lg object-cover" />
+                        ) : (
+                          <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                            <MdFastfood className="h-6 w-6 text-gray-400" />
+                          </div>
+                        )}
+                      </TableCell>
                       <TableCell className="font-medium">{item.name}</TableCell>
                       <TableCell className="max-w-md truncate">
                         {item.description || <span className="text-muted-foreground italic">No description</span>}
                       </TableCell>
-                      <TableCell className="text-right font-medium">${item.price.toFixed(2)}</TableCell>
+                      <TableCell className="text-right font-medium">{item.price.toFixed(2)} Birr</TableCell>
                       <TableCell>
                         <Badge variant={item.isAvailable ? "default" : "secondary"}>
                           {item.isAvailable ? "Available" : "Unavailable"}
