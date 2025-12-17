@@ -1,7 +1,7 @@
 export interface User {
   id: string;
   email: string;
-  role: "OWNER" | "ADMIN" | "CUSTOMER";
+  role: "OWNER" | "ADMIN";
 }
 
 export interface LoginRequest {
@@ -14,11 +14,15 @@ export interface RegisterRequest {
   password: string;
 }
 
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface AuthResponse {
-  status: "success";
+  success: boolean;
   data: {
     user: User;
-    accessToken: string;
-    refreshToken: string;
+    tokens: AuthTokens;
   };
 }

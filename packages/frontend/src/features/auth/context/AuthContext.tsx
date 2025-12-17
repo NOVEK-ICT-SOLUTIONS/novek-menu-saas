@@ -34,20 +34,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (data: LoginRequest) => {
     const response = await apiClient.post<AuthResponse>("/auth/login", data);
-    const { user, accessToken, refreshToken } = response.data.data;
+    const { user, tokens } = response.data.data;
 
-    localStorage.setItem("access_token", accessToken);
-    localStorage.setItem("refresh_token", refreshToken);
+    localStorage.setItem("access_token", tokens.accessToken);
+    localStorage.setItem("refresh_token", tokens.refreshToken);
     localStorage.setItem("user", JSON.stringify(user));
     setUser(user);
   };
 
   const register = async (data: RegisterRequest) => {
     const response = await apiClient.post<AuthResponse>("/auth/register", data);
-    const { user, accessToken, refreshToken } = response.data.data;
+    const { user, tokens } = response.data.data;
 
-    localStorage.setItem("access_token", accessToken);
-    localStorage.setItem("refresh_token", refreshToken);
+    localStorage.setItem("access_token", tokens.accessToken);
+    localStorage.setItem("refresh_token", tokens.refreshToken);
     localStorage.setItem("user", JSON.stringify(user));
     setUser(user);
   };

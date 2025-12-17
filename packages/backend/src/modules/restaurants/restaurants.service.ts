@@ -1,83 +1,99 @@
-import type { RestaurantsRepository } from "@modules/restaurants/restaurants.repository";
-import type { CreateRestaurantRequest, UpdateRestaurantRequest } from "@modules/restaurants/restaurants.types";
-import { AppError } from "@shared/errors/app-error";
-import { logger } from "@shared/utils/logger";
+import { restaurantsRepository } from "./restaurants.repository.ts";
+import type {
+  CreateRestaurantRequest,
+  OwnerStats,
+  RestaurantResponse,
+  RestaurantWithCategories,
+  UpdateRestaurantRequest,
+} from "./restaurants.types.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../core/errors/base.error.ts";
+import { tenantContext } from "../../core/context/tenant.context.ts";
 
-export class RestaurantsService {
-  constructor(private restaurantsRepository: RestaurantsRepository) {}
+export const restaurantsService = {
+  getAll: async (): Promise<RestaurantResponse[]> => {
+    const userId = tenantContext.getUserId();
+    return restaurantsRepository.findAllByOwner(userId);
+  },
 
-  async getAllRestaurants(ownerId: string) {
-    logger.info(`Fetching all restaurants for owner: ${ownerId}`);
-    return this.restaurantsRepository.findAll(ownerId);
-  }
+  getById: async (id: string): Promise<RestaurantWithCategories> => {
+    const userId = tenantContext.getUserId();
+    const restaurant = await restaurantsRepository.findById(id);
 
-  async getRestaurantById(id: string, ownerId: string) {
-    logger.info(`Fetching restaurant: ${id}`);
-    const restaurant = await this.restaurantsRepository.findById(id);
     if (!restaurant) {
-      throw new AppError("Restaurant not found", 404);
+      throw new NotFoundError("Restaurant");
     }
-    if (restaurant.ownerId !== ownerId) {
-      throw new AppError("Unauthorized to access this restaurant", 403);
-    }
-    return restaurant;
-  }
 
-  async getRestaurantBySlug(slug: string) {
-    logger.info(`Fetching restaurant by slug: ${slug}`);
-    const restaurant = await this.restaurantsRepository.findBySlug(slug);
+    if (restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this restaurant");
+    }
+
+    return restaurant as RestaurantWithCategories;
+  },
+
+  getBySlug: async (slug: string): Promise<RestaurantWithCategories> => {
+    const restaurant = await restaurantsRepository.findBySlug(slug);
+
     if (!restaurant) {
-      throw new AppError("Restaurant not found", 404);
+      throw new NotFoundError("Restaurant");
     }
-    return restaurant;
-  }
 
-  async trackQRScan(restaurantId: string, ipAddress?: string, userAgent?: string) {
-    logger.info(`Tracking QR scan for restaurant: ${restaurantId}`);
-    await this.restaurantsRepository.trackQRScan(restaurantId, ipAddress, userAgent);
-  }
+    return restaurant as RestaurantWithCategories;
+  },
 
-  async createRestaurant(ownerId: string, data: CreateRestaurantRequest) {
-    logger.info(`Creating restaurant: ${data.name} for owner: ${ownerId}`);
-    const slugExists = await this.restaurantsRepository.checkSlugExists(data.slug);
-    if (slugExists) {
-      throw new AppError("Restaurant with this slug already exists", 409);
+  create: async (data: CreateRestaurantRequest): Promise<RestaurantResponse> => {
+    const userId = tenantContext.getUserId();
+
+    const existingSlug = await restaurantsRepository.slugExists(data.slug);
+    if (existingSlug) {
+      throw new ConflictError("Restaurant with this slug already exists");
     }
-    const restaurant = await this.restaurantsRepository.create(ownerId, data.name, data.slug);
-    logger.info(`Restaurant created: ${restaurant.id}`);
-    return restaurant;
-  }
 
-  async updateRestaurant(id: string, ownerId: string, data: UpdateRestaurantRequest) {
-    logger.info(`Updating restaurant: ${id}`);
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(id, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized to update this restaurant", 403);
+    return restaurantsRepository.create(userId, data.name, data.slug);
+  },
+
+  update: async (id: string, data: UpdateRestaurantRequest): Promise<RestaurantResponse> => {
+    const userId = tenantContext.getUserId();
+    const restaurant = await restaurantsRepository.findByIdSimple(id);
+
+    if (!restaurant) {
+      throw new NotFoundError("Restaurant");
     }
+
+    if (restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this restaurant");
+    }
+
     if (data.slug) {
-      const existingRestaurant = await this.restaurantsRepository.findBySlug(data.slug);
-      if (existingRestaurant && existingRestaurant.id !== id) {
-        throw new AppError("Restaurant with this slug already exists", 409);
+      const existingSlug = await restaurantsRepository.slugExists(data.slug, id);
+      if (existingSlug) {
+        throw new ConflictError("Restaurant with this slug already exists");
       }
     }
-    const restaurant = await this.restaurantsRepository.update(id, data);
-    logger.info(`Restaurant updated: ${id}`);
-    return restaurant;
-  }
 
-  async deleteRestaurant(id: string, ownerId: string) {
-    logger.info(`Deleting restaurant: ${id}`);
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(id, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized to delete this restaurant", 403);
+    return restaurantsRepository.update(id, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const userId = tenantContext.getUserId();
+    const restaurant = await restaurantsRepository.findByIdSimple(id);
+
+    if (!restaurant) {
+      throw new NotFoundError("Restaurant");
     }
-    await this.restaurantsRepository.delete(id);
-    logger.info(`Restaurant deleted: ${id}`);
-  }
 
-  async getOwnerStats(ownerId: string) {
-    logger.info(`Fetching stats for owner: ${ownerId}`);
-    const stats = await this.restaurantsRepository.getOwnerStats(ownerId);
-    return stats;
-  }
-}
+    if (restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this restaurant");
+    }
+
+    await restaurantsRepository.delete(id);
+  },
+
+  getStats: async (): Promise<OwnerStats> => {
+    const userId = tenantContext.getUserId();
+    return restaurantsRepository.getOwnerStats(userId);
+  },
+
+  trackQrScan: async (restaurantId: string, ipAddress?: string, userAgent?: string): Promise<void> => {
+    await restaurantsRepository.trackQrScan(restaurantId, ipAddress, userAgent);
+  },
+};

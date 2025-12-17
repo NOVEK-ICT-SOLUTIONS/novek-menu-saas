@@ -22,8 +22,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<"div">) 
       toast.success("Logged in successfully!");
       navigate("/dashboard");
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err.response?.data?.message || "Login failed");
+      const err = error as { response?: { data?: { error?: { message?: string } } } };
+      toast.error(err.response?.data?.error?.message || "Login failed");
     } finally {
       setLoading(false);
     }

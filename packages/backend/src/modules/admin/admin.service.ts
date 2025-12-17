@@ -1,52 +1,28 @@
-import type { AdminRepository } from "@modules/admin/admin.repository";
-import { logAction } from "@shared/utils/log-store";
-import { logger } from "@shared/utils/logger";
+import { adminRepository } from "./admin.repository.ts";
+import type { UserRole } from "@prisma/client";
 
-export class AdminService {
-  constructor(private adminRepository: AdminRepository) {}
+export const adminService = {
+  getAllUsers: () => {
+    return adminRepository.findAllUsers();
+  },
 
-  async getAllUsers() {
-    logger.info("Admin: Fetching all users");
-    return this.adminRepository.findAllUsers();
-  }
+  getAllRestaurants: () => {
+    return adminRepository.findAllRestaurants();
+  },
 
-  async getAllRestaurants() {
-    logger.info("Admin: Fetching all restaurants");
-    return this.adminRepository.findAllRestaurants();
-  }
+  getRestaurantById: (restaurantId: string) => {
+    return adminRepository.findRestaurantById(restaurantId);
+  },
 
-  async getRestaurantById(restaurantId: string) {
-    logger.info(`Admin: Fetching restaurant ${restaurantId}`);
-    return this.adminRepository.findRestaurantById(restaurantId);
-  }
+  getStats: () => {
+    return adminRepository.getSystemStats();
+  },
 
-  async getAllMenus() {
-    logger.info("Admin: Fetching all menus");
-    return this.adminRepository.findAllMenus();
-  }
+  getRestaurantStats: () => {
+    return adminRepository.getRestaurantStats();
+  },
 
-  async getStats() {
-    logger.info("Admin: Fetching system stats");
-    return this.adminRepository.getSystemStats();
-  }
-
-  async getRestaurantStats() {
-    logger.info("Admin: Fetching restaurant stats");
-    return this.adminRepository.getRestaurantStats();
-  }
-
-  async updateUserRole(userId: string, role: string) {
-    logger.info(`Admin: Updating user ${userId} role to ${role}`);
-    const user = await this.adminRepository.updateUserRole(userId, role);
-
-    // Log the action
-    logAction("success", "User Role Updated", `User ${user.email} role changed to ${role}`, user.email);
-
-    return user;
-  }
-
-  async getLogs(limit = 100) {
-    logger.info("Admin: Fetching system logs");
-    return this.adminRepository.getLogs(limit);
-  }
-}
+  updateUserRole: (userId: string, role: UserRole) => {
+    return adminRepository.updateUserRole(userId, role);
+  },
+};

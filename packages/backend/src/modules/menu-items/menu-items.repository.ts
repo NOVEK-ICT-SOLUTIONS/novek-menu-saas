@@ -1,49 +1,99 @@
-import { prisma } from "@database/client";
-import type { CreateMenuItemRequest, UpdateMenuItemRequest } from "@modules/menu-items/menu-items.types";
+import { prisma } from "../../core/database/prisma.client.ts";
+import type { CreateMenuItemRequest, UpdateMenuItemRequest } from "./menu-items.types.ts";
 
-export class MenuItemsRepository {
-  async findAllByMenu(menuId: string) {
+const menuItemSelectFields = {
+  id: true,
+  categoryId: true,
+  name: true,
+  description: true,
+  price: true,
+  imageUrl: true,
+  isAvailable: true,
+  sortOrder: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+export const menuItemsRepository = {
+  findAllByCategory: (categoryId: string) => {
     return prisma.menuItem.findMany({
-      where: { menuId },
-      orderBy: { createdAt: "desc" },
-      include: {
-        category: true,
-        menu: { select: { restaurantId: true } },
-      },
+      where: { categoryId },
+      select: menuItemSelectFields,
+      orderBy: { sortOrder: "asc" },
     });
-  }
+  },
 
-  async findById(id: string) {
+  findById: (id: string) => {
     return prisma.menuItem.findUnique({
       where: { id },
-      include: { category: true, menu: true },
+      select: {
+        ...menuItemSelectFields,
+        category: {
+          select: {
+            id: true,
+            restaurantId: true,
+            restaurant: {
+              select: { ownerId: true },
+            },
+          },
+        },
+      },
     });
-  }
+  },
 
-  async create(menuId: string, data: CreateMenuItemRequest) {
+  findByIdSimple: (id: string) => {
+    return prisma.menuItem.findUnique({
+      where: { id },
+      select: {
+        ...menuItemSelectFields,
+        category: {
+          select: {
+            restaurant: {
+              select: { ownerId: true },
+            },
+          },
+        },
+      },
+    });
+  },
+
+  getCategoryOwnerId: (categoryId: string) => {
+    return prisma.category.findUnique({
+      where: { id: categoryId },
+      select: {
+        id: true,
+        restaurantId: true,
+        restaurant: {
+          select: { ownerId: true },
+        },
+      },
+    });
+  },
+
+  create: (data: CreateMenuItemRequest) => {
     return prisma.menuItem.create({
       data: {
-        menuId,
+        categoryId: data.categoryId,
         name: data.name,
         description: data.description,
         price: data.price,
-        categoryId: data.categoryId,
         imageUrl: data.imageUrl,
         isAvailable: data.isAvailable ?? true,
+        sortOrder: data.sortOrder ?? 0,
       },
-      include: { category: true },
+      select: menuItemSelectFields,
     });
-  }
+  },
 
-  async update(id: string, data: UpdateMenuItemRequest) {
+  update: (id: string, data: UpdateMenuItemRequest) => {
     return prisma.menuItem.update({
       where: { id },
       data,
-      include: { category: true },
+      select: menuItemSelectFields,
     });
-  }
+  },
 
-  async delete(id: string) {
+  delete: (id: string) => {
     return prisma.menuItem.delete({ where: { id } });
-  }
-}
+  },
+};

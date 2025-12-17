@@ -1,66 +1,98 @@
-import type { CategoriesRepository } from "@modules/categories/categories.repository";
-import type { CreateCategoryRequest, UpdateCategoryRequest } from "@modules/categories/categories.types";
-import type { RestaurantsRepository } from "@modules/restaurants/restaurants.repository";
-import { AppError } from "@shared/errors/app-error";
-import { logger } from "@shared/utils/logger";
+import { categoriesRepository } from "./categories.repository.ts";
+import type {
+  CategoryResponse,
+  CategoryWithItems,
+  CreateCategoryRequest,
+  UpdateCategoryRequest,
+} from "./categories.types.ts";
+import { ConflictError, ForbiddenError, NotFoundError } from "../../core/errors/base.error.ts";
+import { tenantContext } from "../../core/context/tenant.context.ts";
 
-export class CategoriesService {
-  constructor(
-    private categoriesRepository: CategoriesRepository,
-    private restaurantsRepository: RestaurantsRepository,
-  ) {}
+export const categoriesService = {
+  getAllByRestaurant: async (restaurantId: string): Promise<CategoryWithItems[]> => {
+    const userId = tenantContext.getUserId();
+    const restaurant = await categoriesRepository.getRestaurantOwnerId(restaurantId);
 
-  async getAllCategories(restaurantId: string, ownerId: string) {
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(restaurantId, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized", 403);
+    if (!restaurant) {
+      throw new NotFoundError("Restaurant");
     }
-    return this.categoriesRepository.findAllByRestaurant(restaurantId);
-  }
 
-  async getCategoryById(id: string, ownerId: string) {
-    const category = await this.categoriesRepository.findById(id);
+    if (restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this restaurant");
+    }
+
+    return categoriesRepository.findAllByRestaurant(restaurantId) as Promise<CategoryWithItems[]>;
+  },
+
+  getById: async (id: string): Promise<CategoryWithItems> => {
+    const userId = tenantContext.getUserId();
+    const category = await categoriesRepository.findById(id);
+
     if (!category) {
-      throw new AppError("Category not found", 404);
+      throw new NotFoundError("Category");
     }
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(category.restaurantId, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized", 403);
-    }
-    return category;
-  }
 
-  async createCategory(restaurantId: string, ownerId: string, data: CreateCategoryRequest) {
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(restaurantId, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized", 403);
+    if (category.restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this category");
     }
-    const category = await this.categoriesRepository.create(restaurantId, data);
-    logger.info(`Category created: ${category.id}`);
-    return category;
-  }
 
-  async updateCategory(id: string, ownerId: string, data: UpdateCategoryRequest) {
-    const category = await this.categoriesRepository.findById(id);
+    return category as CategoryWithItems;
+  },
+
+  create: async (data: CreateCategoryRequest): Promise<CategoryResponse> => {
+    const userId = tenantContext.getUserId();
+    const restaurant = await categoriesRepository.getRestaurantOwnerId(data.restaurantId);
+
+    if (!restaurant) {
+      throw new NotFoundError("Restaurant");
+    }
+
+    if (restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this restaurant");
+    }
+
+    const existingName = await categoriesRepository.nameExistsInRestaurant(data.restaurantId, data.name);
+    if (existingName) {
+      throw new ConflictError("Category with this name already exists in the restaurant");
+    }
+
+    return categoriesRepository.create(data);
+  },
+
+  update: async (id: string, data: UpdateCategoryRequest): Promise<CategoryResponse> => {
+    const userId = tenantContext.getUserId();
+    const category = await categoriesRepository.findByIdSimple(id);
+
     if (!category) {
-      throw new AppError("Category not found", 404);
+      throw new NotFoundError("Category");
     }
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(category.restaurantId, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized", 403);
-    }
-    return this.categoriesRepository.update(id, data);
-  }
 
-  async deleteCategory(id: string, ownerId: string) {
-    const category = await this.categoriesRepository.findById(id);
+    if (category.restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this category");
+    }
+
+    if (data.name) {
+      const existingName = await categoriesRepository.nameExistsInRestaurant(category.restaurantId, data.name, id);
+      if (existingName) {
+        throw new ConflictError("Category with this name already exists in the restaurant");
+      }
+    }
+
+    return categoriesRepository.update(id, data);
+  },
+
+  delete: async (id: string): Promise<void> => {
+    const userId = tenantContext.getUserId();
+    const category = await categoriesRepository.findByIdSimple(id);
+
     if (!category) {
-      throw new AppError("Category not found", 404);
+      throw new NotFoundError("Category");
     }
-    const hasOwnership = await this.restaurantsRepository.checkOwnership(category.restaurantId, ownerId);
-    if (!hasOwnership) {
-      throw new AppError("Unauthorized", 403);
+
+    if (category.restaurant.ownerId !== userId) {
+      throw new ForbiddenError("You do not have access to this category");
     }
-    await this.categoriesRepository.delete(id);
-  }
-}
+
+    await categoriesRepository.delete(id);
+  },
+};

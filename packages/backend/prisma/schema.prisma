@@ -10,7 +10,6 @@ datasource db {
 enum UserRole {
   OWNER
   ADMIN
-  CUSTOMER
 }
 
 model User {
@@ -24,78 +23,72 @@ model User {
   restaurants Restaurant[]
 
   @@index([email])
+  @@map("users")
 }
 
 model Restaurant {
-  id               String   @id @default(cuid())
-  ownerId          String
-  name             String
-  slug             String   @unique
-  qrCodeUrl        String?
-  location         String?
-  contactEmail     String?
-  contactPhone     String?
-  primaryColor     String   @default("#ea580c")
-  backgroundColor  String   @default("#ffffff")
-  logoUrl          String?
-  headerImageUrl   String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String   @id @default(cuid())
+  ownerId         String
+  name            String
+  slug            String   @unique
+  description     String?
+  location        String?
+  contactEmail    String?
+  contactPhone    String?
+  primaryColor    String   @default("#ea580c")
+  backgroundColor String   @default("#ffffff")
+  logoUrl         String?
+  headerImageUrl  String?
+  qrCodeUrl       String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  menus      Menu[]
   categories Category[]
   qrScans    QRScan[]
 
   @@index([ownerId])
   @@index([slug])
-}
-
-model Menu {
-  id           String   @id @default(cuid())
-  restaurantId String
-  name         String
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  menuItems  MenuItem[]
-
-  @@index([restaurantId])
-}
-
-model MenuItem {
-  id          String   @id @default(cuid())
-  menuId      String
-  categoryId  String?
-  name        String
-  description String?
-  price       Float
-  imageUrl    String?
-  isAvailable Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  menu     Menu      @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-
-  @@index([menuId])
-  @@index([categoryId])
+  @@map("restaurants")
 }
 
 model Category {
   id           String   @id @default(cuid())
   restaurantId String
   name         String
+  description  String?
   sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
-  menuItems  MenuItem[]
+  items      MenuItem[]
 
+  @@unique([restaurantId, name])
   @@index([restaurantId])
+  @@index([sortOrder])
+  @@map("categories")
+}
+
+model MenuItem {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  isAvailable Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+  @@index([sortOrder])
+  @@map("menu_items")
 }
 
 model QRScan {
@@ -109,4 +102,5 @@ model QRScan {
 
   @@index([restaurantId])
   @@index([scannedAt])
+  @@map("qr_scans")
 }

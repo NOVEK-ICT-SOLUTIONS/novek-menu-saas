@@ -1,122 +1,143 @@
-import { prisma } from "@database/client";
+import { prisma } from "../../core/database/prisma.client.ts";
+import type { UpdateRestaurantRequest } from "./restaurants.types.ts";
 
-export class RestaurantsRepository {
-  async findAll(ownerId: string) {
+const restaurantSelectFields = {
+  id: true,
+  name: true,
+  slug: true,
+  location: true,
+  contactEmail: true,
+  contactPhone: true,
+  primaryColor: true,
+  backgroundColor: true,
+  logoUrl: true,
+  headerImageUrl: true,
+  qrCodeUrl: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+const categorySelectFields = {
+  id: true,
+  name: true,
+  description: true,
+  sortOrder: true,
+  isActive: true,
+} as const;
+
+const menuItemSelectFields = {
+  id: true,
+  name: true,
+  description: true,
+  price: true,
+  imageUrl: true,
+  isAvailable: true,
+} as const;
+
+export const restaurantsRepository = {
+  findAllByOwner: (ownerId: string) => {
     return prisma.restaurant.findMany({
       where: { ownerId },
+      select: restaurantSelectFields,
       orderBy: { createdAt: "desc" },
     });
-  }
+  },
 
-  async findById(id: string) {
+  findById: (id: string) => {
     return prisma.restaurant.findUnique({
       where: { id },
-      include: {
-        menus: { orderBy: { createdAt: "desc" } },
-        categories: { orderBy: { sortOrder: "asc" } },
-      },
-    });
-  }
-
-  async findBySlug(slug: string) {
-    return prisma.restaurant.findUnique({
-      where: { slug },
       select: {
-        id: true,
-        name: true,
-        slug: true,
-        location: true,
-        contactEmail: true,
-        contactPhone: true,
-        primaryColor: true,
-        backgroundColor: true,
-        logoUrl: true,
-        headerImageUrl: true,
-        menus: {
-          where: { isActive: true },
+        ...restaurantSelectFields,
+        ownerId: true,
+        categories: {
           select: {
-            id: true,
-            name: true,
-            isActive: true,
-            menuItems: {
-              where: { isAvailable: true },
-              orderBy: { createdAt: "asc" },
-              select: {
-                id: true,
-                name: true,
-                description: true,
-                price: true,
-                imageUrl: true,
-                isAvailable: true,
-                category: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
-              },
+            ...categorySelectFields,
+            items: {
+              select: menuItemSelectFields,
+              orderBy: { sortOrder: "asc" },
             },
           },
-          orderBy: { createdAt: "asc" },
+          orderBy: { sortOrder: "asc" },
         },
       },
     });
-  }
+  },
 
-  async checkSlugExists(slug: string) {
-    const restaurant = await prisma.restaurant.findUnique({
+  findBySlug: (slug: string) => {
+    return prisma.restaurant.findUnique({
       where: { slug },
+      select: {
+        ...restaurantSelectFields,
+        categories: {
+          where: { isActive: true },
+          select: {
+            ...categorySelectFields,
+            items: {
+              where: { isAvailable: true },
+              select: menuItemSelectFields,
+              orderBy: { sortOrder: "asc" },
+            },
+          },
+          orderBy: { sortOrder: "asc" },
+        },
+      },
+    });
+  },
+
+  findByIdSimple: (id: string) => {
+    return prisma.restaurant.findUnique({
+      where: { id },
+      select: { ...restaurantSelectFields, ownerId: true },
+    });
+  },
+
+  slugExists: (slug: string, excludeId?: string) => {
+    return prisma.restaurant.findFirst({
+      where: {
+        slug,
+        ...(excludeId ? { NOT: { id: excludeId } } : {}),
+      },
       select: { id: true },
     });
-    return !!restaurant;
-  }
+  },
 
-  async create(ownerId: string, name: string, slug: string) {
-    return prisma.restaurant.create({ data: { ownerId, name, slug } });
-  }
-
-  async update(
-    id: string,
-    data: {
-      name?: string;
-      slug?: string;
-      qrCodeUrl?: string;
-      location?: string;
-      contactEmail?: string;
-      contactPhone?: string;
-      primaryColor?: string;
-      backgroundColor?: string;
-      logoUrl?: string;
-      headerImageUrl?: string;
-    },
-  ) {
-    return prisma.restaurant.update({ where: { id }, data });
-  }
-
-  async delete(id: string) {
-    return prisma.restaurant.delete({ where: { id } });
-  }
-
-  async checkOwnership(id: string, ownerId: string) {
-    const restaurant = await prisma.restaurant.findUnique({
-      where: { id },
-      select: { ownerId: true },
+  create: (ownerId: string, name: string, slug: string) => {
+    return prisma.restaurant.create({
+      data: { ownerId, name, slug },
+      select: restaurantSelectFields,
     });
-    return restaurant?.ownerId === ownerId;
-  }
+  },
 
-  async getOwnerStats(ownerId: string) {
+  update: (id: string, data: UpdateRestaurantRequest) => {
+    return prisma.restaurant.update({
+      where: { id },
+      data,
+      select: restaurantSelectFields,
+    });
+  },
+
+  updateQrCode: (id: string, qrCodeUrl: string) => {
+    return prisma.restaurant.update({
+      where: { id },
+      data: { qrCodeUrl },
+      select: restaurantSelectFields,
+    });
+  },
+
+  delete: (id: string) => {
+    return prisma.restaurant.delete({
+      where: { id },
+    });
+  },
+
+  getOwnerStats: async (ownerId: string) => {
     const now = new Date();
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    const [restaurantCount, menuCount, menuItemCount, qrScanCount] = await Promise.all([
+    const [restaurantCount, categoryCount, menuItemCount, qrScanCount] = await Promise.all([
       prisma.restaurant.count({ where: { ownerId } }),
-      prisma.menu.count({
-        where: { restaurant: { ownerId } },
-      }),
-      prisma.menuItem.count({
-        where: { menu: { restaurant: { ownerId } } },
-      }),
+      prisma.category.count({ where: { restaurant: { ownerId } } }),
+      prisma.menuItem.count({ where: { category: { restaurant: { ownerId } } } }),
       prisma.qRScan.count({
         where: {
           restaurant: { ownerId },
@@ -127,13 +148,13 @@ export class RestaurantsRepository {
 
     return {
       restaurants: restaurantCount,
-      menus: menuCount,
+      categories: categoryCount,
       menuItems: menuItemCount,
       qrScans: qrScanCount,
     };
-  }
+  },
 
-  async trackQRScan(restaurantId: string, ipAddress?: string, userAgent?: string) {
+  trackQrScan: (restaurantId: string, ipAddress?: string, userAgent?: string) => {
     return prisma.qRScan.create({
       data: {
         restaurantId,
@@ -141,5 +162,5 @@ export class RestaurantsRepository {
         userAgent,
       },
     });
-  }
-}
+  },
+};

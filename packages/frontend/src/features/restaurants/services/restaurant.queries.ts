@@ -3,11 +3,10 @@ import { toast } from "sonner";
 import {
   type Restaurant,
   type RestaurantFormData,
-  type RestaurantWithMenus,
+  type RestaurantWithCategories,
   restaurantService,
 } from "./restaurant.service";
 
-// Query keys
 export const restaurantKeys = {
   all: ["restaurants"] as const,
   lists: () => [...restaurantKeys.all, "list"] as const,
@@ -15,39 +14,42 @@ export const restaurantKeys = {
   details: () => [...restaurantKeys.all, "detail"] as const,
   detail: (id: string) => [...restaurantKeys.details(), id] as const,
   bySlug: (slug: string) => [...restaurantKeys.all, "slug", slug] as const,
-};
+  stats: () => [...restaurantKeys.all, "stats"] as const,
+} as const;
 
-// Queries
-export const useRestaurants = () => {
-  return useQuery<Restaurant[]>({
+export const useRestaurants = () =>
+  useQuery<Restaurant[]>({
     queryKey: restaurantKeys.lists(),
-    queryFn: restaurantService.getAllRestaurants,
+    queryFn: restaurantService.getAll,
   });
-};
 
-export const useRestaurant = (id: string, enabled = true) => {
-  return useQuery<Restaurant>({
+export const useRestaurant = (id: string, enabled = true) =>
+  useQuery<RestaurantWithCategories>({
     queryKey: restaurantKeys.detail(id),
-    queryFn: () => restaurantService.getRestaurantById(id),
+    queryFn: () => restaurantService.getById(id),
     enabled: enabled && !!id,
   });
-};
 
-export const useRestaurantBySlug = (slug: string) => {
-  return useQuery<RestaurantWithMenus>({
+export const useRestaurantBySlug = (slug: string) =>
+  useQuery<RestaurantWithCategories>({
     queryKey: restaurantKeys.bySlug(slug),
-    queryFn: () => restaurantService.getRestaurantBySlug(slug),
+    queryFn: () => restaurantService.getBySlug(slug),
     retry: false,
+    enabled: !!slug,
   });
-};
 
-// Mutations
+export const useRestaurantStats = () =>
+  useQuery({
+    queryKey: restaurantKeys.stats(),
+    queryFn: restaurantService.getStats,
+  });
+
 export const useUpdateRestaurant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: RestaurantFormData }) =>
-      restaurantService.updateRestaurant(id, data),
+      restaurantService.update(id, data),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: restaurantKeys.detail(variables.id) });
       queryClient.invalidateQueries({ queryKey: restaurantKeys.lists() });
@@ -63,7 +65,7 @@ export const useCreateRestaurant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: restaurantService.createRestaurant,
+    mutationFn: restaurantService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: restaurantKeys.lists() });
       toast.success("Restaurant created successfully!");
@@ -78,7 +80,7 @@ export const useDeleteRestaurant = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: restaurantService.deleteRestaurant,
+    mutationFn: restaurantService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: restaurantKeys.lists() });
       toast.success("Restaurant deleted successfully!");

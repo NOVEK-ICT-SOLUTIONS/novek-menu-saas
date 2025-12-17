@@ -6,13 +6,10 @@ export interface RestaurantListItem {
   name: string;
   slug: string;
   qrCodeUrl: string | null;
+  ownerId: string;
   createdAt: string;
-  owner: {
-    id: string;
-    email: string;
-  };
+  updatedAt: string;
   _count: {
-    menus: number;
     categories: number;
   };
 }
@@ -22,25 +19,16 @@ export interface RestaurantDetail {
   name: string;
   slug: string;
   qrCodeUrl: string | null;
+  ownerId: string;
   createdAt: string;
-  owner: {
-    id: string;
-    email: string;
-  };
-  menus: Array<{
-    id: string;
-    name: string;
-    isActive: boolean;
-    createdAt: string;
-    _count: {
-      menuItems: number;
-    };
-  }>;
+  updatedAt: string;
   categories: Array<{
     id: string;
     name: string;
+    isActive: boolean;
+    sortOrder: number;
     _count: {
-      menuItems: number;
+      items: number;
     };
   }>;
 }
@@ -56,35 +44,23 @@ export interface RestaurantDetailResponse {
 const BASE_PATH = "/admin/restaurants";
 
 export const AdminRestaurantsApi = {
-  async getAllRestaurants(): Promise<RestaurantListItem[]> {
-    try {
-      const response = await apiClient.get<ApiResponse<RestaurantsListResponse>>(BASE_PATH);
-      return response.data.data.restaurants;
-    } catch (error) {
-      console.error("[AdminRestaurantsApi] Failed to fetch restaurants:", error);
-      throw new Error("Failed to fetch restaurants. Please try again.");
-    }
+  getAll: async (): Promise<RestaurantListItem[]> => {
+    const response = await apiClient.get<ApiResponse<RestaurantsListResponse>>(BASE_PATH);
+    return response.data.data.restaurants;
   },
 
-  async getRestaurantById(restaurantId: string): Promise<RestaurantDetail> {
-    try {
-      const response = await apiClient.get<ApiResponse<RestaurantDetailResponse>>(`${BASE_PATH}/${restaurantId}`);
-      return response.data.data.restaurant;
-    } catch (error) {
-      console.error(`[AdminRestaurantsApi] Failed to fetch restaurant ${restaurantId}:`, error);
-      throw new Error("Failed to fetch restaurant details. Please try again.");
-    }
+  getById: async (restaurantId: string): Promise<RestaurantDetail> => {
+    const response = await apiClient.get<ApiResponse<RestaurantDetailResponse>>(`${BASE_PATH}/${restaurantId}`);
+    return response.data.data.restaurant;
   },
 
-  calculateStats(restaurants: RestaurantListItem[]) {
-    return {
-      total: restaurants.length,
-      withQrCodes: restaurants.filter((r) => r.qrCodeUrl).length,
-      totalMenus: restaurants.reduce((sum, r) => sum + r._count.menus, 0),
-      avgMenusPerRestaurant:
-        restaurants.length > 0
-          ? (restaurants.reduce((sum, r) => sum + r._count.menus, 0) / restaurants.length).toFixed(1)
-          : "0",
-    };
-  },
+  calculateStats: (restaurants: RestaurantListItem[]) => ({
+    total: restaurants.length,
+    withQrCodes: restaurants.filter((r) => r.qrCodeUrl).length,
+    totalCategories: restaurants.reduce((sum, r) => sum + r._count.categories, 0),
+    avgCategoriesPerRestaurant:
+      restaurants.length > 0
+        ? (restaurants.reduce((sum, r) => sum + r._count.categories, 0) / restaurants.length).toFixed(1)
+        : "0",
+  }),
 };

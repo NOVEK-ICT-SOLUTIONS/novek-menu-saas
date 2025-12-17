@@ -1,63 +1,84 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api-client";
-import type { CreateMenuItemRequest, MenuItem, UpdateMenuItemRequest } from "@/shared/types/api.types";
+import { toast } from "sonner";
+import {
+  type CreateMenuItemData,
+  type MenuItem,
+  type UpdateMenuItemData,
+  menuItemService,
+} from "../menu-items.service";
 
-export const useMenuItems = (menuId: string) => {
-  return useQuery({
-    queryKey: ["menuItems", menuId],
-    queryFn: async () => {
-      const response = await apiClient.get<{ status: string; data: { menuItems: MenuItem[] } }>(
-        `/menu-items/menu/${menuId}`,
-      );
-      return response.data.data.menuItems;
-    },
-    enabled: !!menuId,
-  });
+export const menuItemKeys = {
+  all: ["menuItems"] as const,
+  lists: () => [...menuItemKeys.all, "list"] as const,
+  byCategory: (categoryId: string) => [...menuItemKeys.lists(), categoryId] as const,
+  details: () => [...menuItemKeys.all, "detail"] as const,
+  detail: (id: string) => [...menuItemKeys.details(), id] as const,
+} as const;
+
+const invalidateRelatedQueries = (queryClient: ReturnType<typeof useQueryClient>, categoryId: string) => {
+  queryClient.invalidateQueries({ queryKey: menuItemKeys.byCategory(categoryId) });
+  queryClient.invalidateQueries({ queryKey: ["categories"] });
+  queryClient.invalidateQueries({ queryKey: ["restaurants"] });
 };
+
+export const useMenuItemsByCategory = (categoryId: string) =>
+  useQuery<MenuItem[]>({
+    queryKey: menuItemKeys.byCategory(categoryId),
+    queryFn: () => menuItemService.getAllByCategory(categoryId),
+    enabled: !!categoryId,
+  });
+
+export const useMenuItem = (id: string) =>
+  useQuery<MenuItem>({
+    queryKey: menuItemKeys.detail(id),
+    queryFn: () => menuItemService.getById(id),
+    enabled: !!id,
+  });
 
 export const useCreateMenuItem = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ menuId, data }: { menuId: string; data: CreateMenuItemRequest }) => {
-      const response = await apiClient.post<{ status: string; data: { menuItem: MenuItem } }>(
-        `/menu-items/menu/${menuId}`,
-        data,
-      );
-      return response.data.data.menuItem;
-    },
+    mutationFn: (data: CreateMenuItemData) => menuItemService.create(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["menuItems", variables.menuId] });
+      invalidateRelatedQueries(queryClient, variables.categoryId);
+      toast.success("Item created successfully!");
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error.response?.data?.message || "Failed to create item");
     },
   });
 };
 
-export const useUpdateMenuItem = () => {
+export const useUpdateMenuItem = (categoryId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateMenuItemRequest }) => {
-      const response = await apiClient.patch<{ status: string; data: { menuItem: MenuItem } }>(
-        `/menu-items/${id}`,
-        data,
-      );
-      return response.data.data.menuItem;
+    mutationFn: ({ id, data }: { id: string; data: UpdateMenuItemData }) => menuItemService.update(id, data),
+    onSuccess: (_, variables) => {
+      invalidateRelatedQueries(queryClient, categoryId);
+      queryClient.invalidateQueries({ queryKey: menuItemKeys.detail(variables.id) });
+      toast.success("Item updated successfully!");
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["menuItems"] });
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error.response?.data?.message || "Failed to update item");
     },
   });
 };
 
-export const useDeleteMenuItem = () => {
+export const useDeleteMenuItem = (categoryId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      await apiClient.delete(`/menu-items/${id}`);
-    },
+    mutationFn: (id: string) => menuItemService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["menuItems"] });
+      invalidateRelatedQueries(queryClient, categoryId);
+      toast.success("Item deleted successfully!");
+    },
+    onError: (error: { response?: { data?: { message?: string } } }) => {
+      toast.error(error.response?.data?.message || "Failed to delete item");
     },
   });
 };
+
+export const useMenuItems = (categoryId: string) => useMenuItemsByCategory(categoryId);

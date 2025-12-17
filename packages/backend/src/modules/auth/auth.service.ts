@@ -1,44 +1,24 @@
-import type { AuthRepository } from "@modules/auth/auth.repository";
-import type { AuthResponse, LoginRequest, RefreshResponse, RegisterRequest } from "@modules/auth/auth.types";
-import { AppError } from "@shared/errors/app-error";
-import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "@shared/utils/jwt";
-import { logAction } from "@shared/utils/log-store";
-import { logger } from "@shared/utils/logger";
-import { comparePassword, hashPassword } from "@shared/utils/password";
+import { authRepository } from "./auth.repository.ts";
+import type { AuthResponse, LoginRequest, RefreshResponse, RegisterRequest } from "./auth.types.ts";
+import { ConflictError, NotFoundError, UnauthorizedError } from "../../core/errors/base.error.ts";
+import { tokenService } from "../../core/auth/token.service.ts";
+import { passwordService } from "../../core/auth/password.service.ts";
 
-export class AuthService {
-  constructor(private authRepository: AuthRepository) {}
-
-  async register(data: RegisterRequest): Promise<AuthResponse> {
-    const { email, password } = data;
-
-    logger.info(`Registration attempt for email: ${email}`);
-
-    const existingUser = await this.authRepository.findUserByEmail(email);
+export const authService = {
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+    const existingUser = await authRepository.findByEmail(data.email);
     if (existingUser) {
-      logger.warn(`Registration failed: Email already exists - ${email}`);
-      throw new AppError("Email already registered", 409);
+      throw new ConflictError("Email already registered");
     }
 
-    const hashedPassword = await hashPassword(password);
-    const user = await this.authRepository.createUser(email, hashedPassword);
+    const hashedPassword = await passwordService.hash(data.password);
+    const user = await authRepository.create(data.email, hashedPassword);
 
-    const accessToken = generateAccessToken({
+    const tokens = tokenService.generateTokenPair({
       userId: user.id,
       email: user.email,
       role: user.role,
     });
-
-    const refreshToken = generateRefreshToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    logger.info(`User registered successfully: ${email}`);
-
-    // Log the registration
-    logAction("success", "User Registration", `New user registered: ${email}`, email);
 
     return {
       user: {
@@ -46,45 +26,26 @@ export class AuthService {
         email: user.email,
         role: user.role,
       },
-      accessToken,
-      refreshToken,
+      tokens,
     };
-  }
+  },
 
-  async login(data: LoginRequest): Promise<AuthResponse> {
-    const { email, password } = data;
-
-    logger.info(`Login attempt for email: ${email}`);
-
-    const user = await this.authRepository.findUserByEmail(email);
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    const user = await authRepository.findByEmail(data.email);
     if (!user) {
-      logger.warn(`Login failed: User not found - ${email}`);
-      throw new AppError("Invalid credentials", 401);
+      throw new UnauthorizedError("Invalid credentials");
     }
 
-    const isPasswordValid = await comparePassword(password, user.password);
+    const isPasswordValid = await passwordService.verify(data.password, user.password);
     if (!isPasswordValid) {
-      logger.warn(`Login failed: Invalid password - ${email}`);
-      logAction("error", "Login Failed", `Invalid password for user: ${email}`, email);
-      throw new AppError("Invalid credentials", 401);
+      throw new UnauthorizedError("Invalid credentials");
     }
 
-    const accessToken = generateAccessToken({
+    const tokens = tokenService.generateTokenPair({
       userId: user.id,
       email: user.email,
       role: user.role,
     });
-
-    const refreshToken = generateRefreshToken({
-      userId: user.id,
-      email: user.email,
-      role: user.role,
-    });
-
-    logger.info(`User logged in successfully: ${email}`);
-
-    // Log the successful login
-    logAction("success", "User Login", `User logged in: ${email}`, email);
 
     return {
       user: {
@@ -92,30 +53,24 @@ export class AuthService {
         email: user.email,
         role: user.role,
       },
-      accessToken,
-      refreshToken,
+      tokens,
     };
-  }
+  },
 
-  async refreshAccessToken(refreshToken: string): Promise<RefreshResponse> {
-    logger.info("Refresh token request");
+  refreshAccessToken: async (refreshToken: string): Promise<RefreshResponse> => {
+    const payload = tokenService.verifyRefreshToken(refreshToken);
 
-    const payload = verifyRefreshToken(refreshToken);
-
-    const user = await this.authRepository.findUserById(payload.userId);
+    const user = await authRepository.findById(payload.userId);
     if (!user) {
-      logger.warn(`Refresh failed: User not found - ${payload.userId}`);
-      throw new AppError("User not found", 404);
+      throw new NotFoundError("User");
     }
 
-    const accessToken = generateAccessToken({
+    const accessToken = tokenService.generateAccessToken({
       userId: user.id,
       email: user.email,
       role: user.role,
     });
-
-    logger.info(`Access token refreshed for user: ${user.email}`);
 
     return { accessToken };
-  }
-}
+  },
+};

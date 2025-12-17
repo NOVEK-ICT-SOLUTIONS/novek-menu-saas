@@ -146,8 +146,8 @@ const RestaurantsPage = () => {
                 <CardDescription className="text-xs md:text-sm">/{restaurant.slug}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 p-4 pt-0">
-                <Button className="w-full text-sm" onClick={() => navigate(`/restaurants/${restaurant.id}/menus`)}>
-                  Manage Menus
+                <Button className="w-full text-sm" onClick={() => navigate(`/restaurants/${restaurant.id}/categories`)}>
+                  Manage Categories
                 </Button>
                 <Button
                   variant="destructive"

@@ -1,88 +1,79 @@
-import type { RestaurantsService } from "@modules/restaurants/restaurants.service";
-import type { CreateRestaurantRequest, UpdateRestaurantRequest } from "@modules/restaurants/restaurants.types";
 import type { NextFunction, Request, Response } from "express";
+import { restaurantsService } from "./restaurants.service.ts";
+import type { CreateRestaurantRequest, UpdateRestaurantRequest } from "./restaurants.types.ts";
 
-export class RestaurantsController {
-  constructor(private restaurantsService: RestaurantsService) {}
+const HTTP_STATUS_OK = 200;
+const HTTP_STATUS_CREATED = 201;
+const HTTP_STATUS_NO_CONTENT = 204;
 
-  getAll = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const ownerId = req.user?.userId;
-      const restaurants = await this.restaurantsService.getAllRestaurants(ownerId);
-      res.status(200).json({ status: "success", data: { restaurants } });
-    } catch (error) {
-      next(error);
-    }
-  };
+export const restaurantsController = {
+  getAll: async (_req: Request, res: Response, _next: NextFunction) => {
+    const restaurants = await restaurantsService.getAll();
 
-  getById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const ownerId = req.user?.userId;
-      const restaurant = await this.restaurantsService.getRestaurantById(id, ownerId);
-      res.status(200).json({ status: "success", data: { restaurant } });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { restaurants },
+    });
+  },
 
-  getBySlug = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { slug } = req.params;
-      const restaurant = await this.restaurantsService.getRestaurantBySlug(slug);
-      
-      // Track QR scan
-      const ipAddress = req.ip || req.socket.remoteAddress;
-      const userAgent = req.get("user-agent");
-      await this.restaurantsService.trackQRScan(restaurant.id, ipAddress, userAgent);
-      
-      res.status(200).json({ status: "success", data: { restaurant } });
-    } catch (error) {
-      next(error);
-    }
-  };
+  getById: async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+    const restaurant = await restaurantsService.getById(id);
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const ownerId = req.user?.userId;
-      const data: CreateRestaurantRequest = req.body;
-      const restaurant = await this.restaurantsService.createRestaurant(ownerId, data);
-      res.status(201).json({ status: "success", data: { restaurant } });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { restaurant },
+    });
+  },
 
-  update = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const ownerId = req.user?.userId;
-      const data: UpdateRestaurantRequest = req.body;
-      const restaurant = await this.restaurantsService.updateRestaurant(id, ownerId, data);
-      res.status(200).json({ status: "success", data: { restaurant } });
-    } catch (error) {
-      next(error);
-    }
-  };
+  getBySlug: async (req: Request, res: Response, _next: NextFunction) => {
+    const { slug } = req.params;
+    const restaurant = await restaurantsService.getBySlug(slug);
 
-  delete = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const ownerId = req.user?.userId;
-      await this.restaurantsService.deleteRestaurant(id, ownerId);
-      res.status(204).send();
-    } catch (error) {
-      next(error);
-    }
-  };
+    const ipAddress = req.ip ?? req.socket.remoteAddress;
+    const userAgent = req.get("user-agent");
+    await restaurantsService.trackQrScan(restaurant.id, ipAddress, userAgent);
 
-  getStats = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const ownerId = req.user?.userId;
-      const stats = await this.restaurantsService.getOwnerStats(ownerId);
-      res.status(200).json({ status: "success", data: stats });
-    } catch (error) {
-      next(error);
-    }
-  };
-}
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { restaurant },
+    });
+  },
+
+  create: async (req: Request, res: Response, _next: NextFunction) => {
+    const data: CreateRestaurantRequest = req.body;
+    const restaurant = await restaurantsService.create(data);
+
+    res.status(HTTP_STATUS_CREATED).json({
+      success: true,
+      data: { restaurant },
+    });
+  },
+
+  update: async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+    const data: UpdateRestaurantRequest = req.body;
+    const restaurant = await restaurantsService.update(id, data);
+
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { restaurant },
+    });
+  },
+
+  delete: async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+    await restaurantsService.delete(id);
+
+    res.status(HTTP_STATUS_NO_CONTENT).send();
+  },
+
+  getStats: async (_req: Request, res: Response, _next: NextFunction) => {
+    const stats = await restaurantsService.getStats();
+
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: stats,
+    });
+  },
+};

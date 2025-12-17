@@ -1,8 +1,8 @@
-import { prisma } from "../../database/client";
-import { logStore } from "../../shared/utils/log-store";
+import { prisma } from "../../core/database/prisma.client.ts";
+import type { UserRole } from "@prisma/client";
 
-export class AdminRepository {
-  async findAllUsers() {
+export const adminRepository = {
+  findAllUsers: () => {
     return prisma.user.findMany({
       select: {
         id: true,
@@ -18,36 +18,29 @@ export class AdminRepository {
       },
       orderBy: { createdAt: "desc" },
     });
-  }
+  },
 
-  async findAllRestaurants() {
+  findAllRestaurants: () => {
     return prisma.restaurant.findMany({
       select: {
         id: true,
         name: true,
         slug: true,
         qrCodeUrl: true,
+        ownerId: true,
         createdAt: true,
         updatedAt: true,
-        owner: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-          },
-        },
         _count: {
           select: {
-            menus: true,
             categories: true,
           },
         },
       },
       orderBy: { createdAt: "desc" },
     });
-  }
+  },
 
-  async findRestaurantById(restaurantId: string) {
+  findRestaurantById: (restaurantId: string) => {
     return prisma.restaurant.findUnique({
       where: { id: restaurantId },
       select: {
@@ -55,70 +48,28 @@ export class AdminRepository {
         name: true,
         slug: true,
         qrCodeUrl: true,
+        ownerId: true,
         createdAt: true,
         updatedAt: true,
-        owner: {
-          select: {
-            id: true,
-            email: true,
-          },
-        },
-        menus: {
-          select: {
-            id: true,
-            name: true,
-            isActive: true,
-            createdAt: true,
-            _count: {
-              select: {
-                menuItems: true,
-              },
-            },
-          },
-          orderBy: { createdAt: "desc" },
-        },
         categories: {
           select: {
             id: true,
             name: true,
+            isActive: true,
+            sortOrder: true,
             _count: {
               select: {
-                menuItems: true,
+                items: true,
               },
             },
           },
-          orderBy: { name: "asc" },
+          orderBy: { sortOrder: "asc" },
         },
       },
     });
-  }
+  },
 
-  async findAllMenus() {
-    return prisma.menu.findMany({
-      select: {
-        id: true,
-        name: true,
-        isActive: true,
-        createdAt: true,
-        updatedAt: true,
-        restaurant: {
-          select: {
-            id: true,
-            name: true,
-            slug: true,
-          },
-        },
-        _count: {
-          select: {
-            menuItems: true,
-          },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
-  }
-
-  async getSystemStats() {
+  getSystemStats: async () => {
     const now = new Date();
     const firstDayThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const firstDayLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
@@ -126,18 +77,18 @@ export class AdminRepository {
     const [
       totalUsers,
       totalRestaurants,
-      totalMenus,
+      totalCategories,
       totalMenuItems,
       newUsersThisMonth,
       newUsersLastMonth,
-      activeMenus,
+      activeCategories,
       totalQRScans,
       qrScansThisMonth,
       qrScansLastMonth,
     ] = await Promise.all([
       prisma.user.count(),
       prisma.restaurant.count(),
-      prisma.menu.count(),
+      prisma.category.count(),
       prisma.menuItem.count(),
       prisma.user.count({ where: { createdAt: { gte: firstDayThisMonth } } }),
       prisma.user.count({
@@ -145,7 +96,7 @@ export class AdminRepository {
           createdAt: { gte: firstDayLastMonth, lt: firstDayThisMonth },
         },
       }),
-      prisma.menu.count({ where: { isActive: true } }),
+      prisma.category.count({ where: { isActive: true } }),
       prisma.qRScan.count(),
       prisma.qRScan.count({ where: { scannedAt: { gte: firstDayThisMonth } } }),
       prisma.qRScan.count({
@@ -155,31 +106,32 @@ export class AdminRepository {
       }),
     ]);
 
-    const userGrowth = newUsersLastMonth > 0 ? ((newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * 100 : 0;
-    const scanGrowth = qrScansLastMonth > 0 ? ((qrScansThisMonth - qrScansLastMonth) / qrScansLastMonth) * 100 : 0;
+    const PERCENTAGE_MULTIPLIER = 100;
+    const userGrowth = newUsersLastMonth > 0 ? ((newUsersThisMonth - newUsersLastMonth) / newUsersLastMonth) * PERCENTAGE_MULTIPLIER : 0;
+    const scanGrowth = qrScansLastMonth > 0 ? ((qrScansThisMonth - qrScansLastMonth) / qrScansLastMonth) * PERCENTAGE_MULTIPLIER : 0;
 
-    const avgMenusPerRestaurant = totalRestaurants > 0 ? totalMenus / totalRestaurants : 0;
-    const avgItemsPerMenu = totalMenus > 0 ? totalMenuItems / totalMenus : 0;
+    const avgCategoriesPerRestaurant = totalRestaurants > 0 ? totalCategories / totalRestaurants : 0;
+    const avgItemsPerCategory = totalCategories > 0 ? totalMenuItems / totalCategories : 0;
     const avgScansPerRestaurant = totalRestaurants > 0 ? totalQRScans / totalRestaurants : 0;
 
     return {
       totalUsers,
       totalRestaurants,
-      totalMenus,
+      totalCategories,
       totalMenuItems,
       totalQRScans,
       qrScansThisMonth,
       newUsersThisMonth,
-      activeMenus,
+      activeCategories,
       userGrowth: Math.round(userGrowth),
       scanGrowth: Math.round(scanGrowth),
-      avgMenusPerRestaurant: Number(avgMenusPerRestaurant.toFixed(1)),
-      avgItemsPerMenu: Number(avgItemsPerMenu.toFixed(1)),
+      avgCategoriesPerRestaurant: Number(avgCategoriesPerRestaurant.toFixed(1)),
+      avgItemsPerCategory: Number(avgItemsPerCategory.toFixed(1)),
       avgScansPerRestaurant: Number(avgScansPerRestaurant.toFixed(1)),
     };
-  }
+  },
 
-  async getRestaurantStats() {
+  getRestaurantStats: async () => {
     const now = new Date();
     const firstDayThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
@@ -188,15 +140,10 @@ export class AdminRepository {
         id: true,
         name: true,
         slug: true,
+        ownerId: true,
         createdAt: true,
-        owner: {
-          select: {
-            email: true,
-          },
-        },
         _count: {
           select: {
-            menus: true,
             categories: true,
             qrScans: true,
           },
@@ -205,8 +152,7 @@ export class AdminRepository {
       orderBy: { createdAt: "desc" },
     });
 
-    // Get QR scans this month for each restaurant
-    const restaurantIds = restaurants.map(r => r.id);
+    const restaurantIds = restaurants.map((r) => r.id);
     const scansThisMonth = await prisma.qRScan.groupBy({
       by: ["restaurantId"],
       where: {
@@ -218,46 +164,48 @@ export class AdminRepository {
       },
     });
 
-    const scansByRestaurant = Object.fromEntries(
-      scansThisMonth.map(s => [s.restaurantId, s._count.id])
-    );
+    const scansByRestaurant = Object.fromEntries(scansThisMonth.map((s) => [s.restaurantId, s._count.id]));
 
-    // Get menu items count for each restaurant
-    const menuItemCounts = await prisma.menuItem.groupBy({
-      by: ["menuId"],
+    const itemCountsByRestaurant = await prisma.menuItem.groupBy({
+      by: ["categoryId"],
       _count: {
         id: true,
       },
     });
 
-    const menusByRestaurant = await prisma.menu.findMany({
+    const categoriesByRestaurant = await prisma.category.findMany({
       select: {
         id: true,
         restaurantId: true,
       },
     });
 
-    const itemCountsByRestaurant: Record<string, number> = {};
-    for (const menu of menusByRestaurant) {
-      const count = menuItemCounts.find(m => m.menuId === menu.id)?._count.id || 0;
-      itemCountsByRestaurant[menu.restaurantId] = (itemCountsByRestaurant[menu.restaurantId] || 0) + count;
+    const itemsByRestaurant: Record<string, number> = {};
+    for (const category of categoriesByRestaurant) {
+      const count = itemCountsByRestaurant.find((c) => c.categoryId === category.id)?._count.id ?? 0;
+      itemsByRestaurant[category.restaurantId] = (itemsByRestaurant[category.restaurantId] ?? 0) + count;
     }
 
-    return restaurants.map(restaurant => ({
+    const owners = await prisma.user.findMany({
+      where: { id: { in: restaurants.map((r) => r.ownerId) } },
+      select: { id: true, email: true },
+    });
+    const ownerMap = Object.fromEntries(owners.map((o) => [o.id, o.email]));
+
+    return restaurants.map((restaurant) => ({
       id: restaurant.id,
       name: restaurant.name,
       slug: restaurant.slug,
-      ownerEmail: restaurant.owner.email,
+      ownerEmail: ownerMap[restaurant.ownerId] ?? "Unknown",
       createdAt: restaurant.createdAt,
-      totalMenus: restaurant._count.menus,
       totalCategories: restaurant._count.categories,
-      totalMenuItems: itemCountsByRestaurant[restaurant.id] || 0,
+      totalMenuItems: itemsByRestaurant[restaurant.id] ?? 0,
       totalScans: restaurant._count.qrScans,
-      scansThisMonth: scansByRestaurant[restaurant.id] || 0,
+      scansThisMonth: scansByRestaurant[restaurant.id] ?? 0,
     }));
-  }
+  },
 
-  async updateUserRole(userId: string, role: string) {
+  updateUserRole: (userId: string, role: UserRole) => {
     return prisma.user.update({
       where: { id: userId },
       data: { role },
@@ -267,9 +215,5 @@ export class AdminRepository {
         role: true,
       },
     });
-  }
-
-  async getLogs(limit = 100) {
-    return logStore.getLogs(limit);
-  }
-}
+  },
+};

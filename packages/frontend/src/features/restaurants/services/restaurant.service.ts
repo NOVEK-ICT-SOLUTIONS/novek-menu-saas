@@ -7,13 +7,18 @@ export interface Restaurant {
   location: string | null;
   contactEmail: string | null;
   contactPhone: string | null;
-  primaryColor: string;
-  backgroundColor: string;
+  primaryColor: string | null;
+  backgroundColor: string | null;
   logoUrl: string | null;
   headerImageUrl: string | null;
+  qrCodeUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface RestaurantFormData {
+  name?: string;
+  slug?: string;
   location?: string;
   contactEmail?: string;
   contactPhone?: string;
@@ -30,56 +35,60 @@ export interface MenuItem {
   price: number;
   isAvailable: boolean;
   imageUrl: string | null;
-  category: {
-    id: string;
-    name: string;
-  } | null;
 }
 
-export interface Menu {
+export interface Category {
   id: string;
   name: string;
+  description: string | null;
+  sortOrder: number;
   isActive: boolean;
-  menuItems: MenuItem[];
+  items: MenuItem[];
 }
 
-export interface RestaurantWithMenus extends Restaurant {
-  menus: Menu[];
+export interface RestaurantWithCategories extends Restaurant {
+  categories: Category[];
+}
+
+export interface OwnerStats {
+  restaurants: number;
+  categories: number;
+  menuItems: number;
+  qrScans: number;
 }
 
 export const restaurantService = {
-  // Get all restaurants for the current owner
-  getAllRestaurants: async (): Promise<Restaurant[]> => {
+  getAll: async (): Promise<Restaurant[]> => {
     const response = await apiClient.get("/restaurants");
     return response.data.data.restaurants;
   },
 
-  // Get a single restaurant by ID
-  getRestaurantById: async (id: string): Promise<Restaurant> => {
+  getById: async (id: string): Promise<RestaurantWithCategories> => {
     const response = await apiClient.get(`/restaurants/${id}`);
     return response.data.data.restaurant;
   },
 
-  // Get a restaurant by slug (public endpoint)
-  getRestaurantBySlug: async (slug: string): Promise<RestaurantWithMenus> => {
-    const response = await apiClient.get(`/restaurants/slug/${slug}`);
+  getBySlug: async (slug: string): Promise<RestaurantWithCategories> => {
+    const response = await apiClient.get(`/public/menu/${slug}`);
     return response.data.data.restaurant;
   },
 
-  // Update restaurant customization
-  updateRestaurant: async (id: string, data: RestaurantFormData): Promise<Restaurant> => {
-    const response = await apiClient.patch(`/restaurants/${id}`, data);
-    return response.data.data.restaurant;
-  },
-
-  // Create a new restaurant
-  createRestaurant: async (data: { name: string; slug: string }): Promise<Restaurant> => {
+  create: async (data: { name: string; slug: string }): Promise<Restaurant> => {
     const response = await apiClient.post("/restaurants", data);
     return response.data.data.restaurant;
   },
 
-  // Delete a restaurant
-  deleteRestaurant: async (id: string): Promise<void> => {
+  update: async (id: string, data: RestaurantFormData): Promise<Restaurant> => {
+    const response = await apiClient.patch(`/restaurants/${id}`, data);
+    return response.data.data.restaurant;
+  },
+
+  delete: async (id: string): Promise<void> => {
     await apiClient.delete(`/restaurants/${id}`);
+  },
+
+  getStats: async (): Promise<OwnerStats> => {
+    const response = await apiClient.get("/restaurants/stats");
+    return response.data.data;
   },
 };

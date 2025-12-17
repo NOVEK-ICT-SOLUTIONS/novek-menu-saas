@@ -1,19 +1,25 @@
 import { z } from "zod";
+import { commonSchemas } from "../../core/validation/schemas.ts";
 
 export const createMenuItemSchema = z.object({
-  name: z.string().min(1, "Item name is required").max(100, "Name too long"),
-  description: z.string().max(500, "Description too long").optional(),
-  price: z.number().min(0, "Price must be positive"),
-  categoryId: z.string().optional(),
-  imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
-  isAvailable: z.boolean().optional().default(true),
+  categoryId: commonSchemas.id,
+  name: commonSchemas.name,
+  description: commonSchemas.description,
+  price: commonSchemas.price,
+  imageUrl: commonSchemas.url,
+  isAvailable: z.boolean().default(true),
+  sortOrder: commonSchemas.sortOrder,
 });
 
 export const updateMenuItemSchema = z.object({
-  name: z.string().min(1, "Item name is required").max(100, "Name too long").optional(),
-  description: z.string().max(500, "Description too long").optional(),
-  price: z.number().min(0, "Price must be positive").optional(),
-  categoryId: z.string().optional(),
-  imageUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  name: commonSchemas.name.optional(),
+  description: commonSchemas.description,
+  price: commonSchemas.price.optional(),
+  imageUrl: commonSchemas.url,
   isAvailable: z.boolean().optional(),
+  sortOrder: commonSchemas.sortOrder.optional(),
+});
+
+export const menuItemIdParamSchema = z.object({
+  id: commonSchemas.id,
 });

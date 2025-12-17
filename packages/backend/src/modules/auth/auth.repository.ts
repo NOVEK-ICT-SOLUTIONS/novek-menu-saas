@@ -1,46 +1,46 @@
-import { prisma } from "@database/client";
+import { prisma } from "../../core/database/prisma.client.ts";
 import type { UserRole } from "@prisma/client";
 
-export class AuthRepository {
-  async findUserByEmail(email: string) {
+const DEFAULT_USER_ROLE: UserRole = "OWNER";
+
+const userSelectFields = {
+  id: true,
+  email: true,
+  role: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
+export const authRepository = {
+  findByEmail: (email: string) => {
     return prisma.user.findUnique({
       where: { email },
     });
-  }
+  },
 
-  async findUserById(id: string) {
+  findById: (id: string) => {
     return prisma.user.findUnique({
       where: { id },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      select: userSelectFields,
     });
-  }
+  },
 
-  async createUser(email: string, hashedPassword: string, role: UserRole = "OWNER") {
+  create: (email: string, hashedPassword: string, role: UserRole = DEFAULT_USER_ROLE) => {
     return prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         role,
       },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
-      },
+      select: userSelectFields,
     });
-  }
+  },
 
-  async updateUser(id: string, data: { password?: string }) {
+  updatePassword: (id: string, hashedPassword: string) => {
     return prisma.user.update({
       where: { id },
-      data,
+      data: { password: hashedPassword },
+      select: userSelectFields,
     });
-  }
-}
+  },
+};

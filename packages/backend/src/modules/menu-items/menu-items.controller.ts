@@ -1,61 +1,57 @@
-import type { MenuItemsService } from "@modules/menu-items/menu-items.service";
 import type { NextFunction, Request, Response } from "express";
+import { menuItemsService } from "./menu-items.service.ts";
+import type { CreateMenuItemRequest, UpdateMenuItemRequest } from "./menu-items.types.ts";
 
-export class MenuItemsController {
-  constructor(private menuItemsService: MenuItemsService) {}
+const HTTP_STATUS_OK = 200;
+const HTTP_STATUS_CREATED = 201;
+const HTTP_STATUS_NO_CONTENT = 204;
 
-  getAll = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { menuId } = req.params;
-      const ownerId = req.user?.userId;
-      const menuItems = await this.menuItemsService.getAllMenuItems(menuId, ownerId);
-      res.status(200).json({ status: "success", data: { menuItems } });
-    } catch (error) {
-      next(error);
-    }
-  };
+export const menuItemsController = {
+  getAllByCategory: async (req: Request, res: Response, _next: NextFunction) => {
+    const { categoryId } = req.params;
+    const menuItems = await menuItemsService.getAllByCategory(categoryId);
 
-  getById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const ownerId = req.user?.userId;
-      const menuItem = await this.menuItemsService.getMenuItemById(id, ownerId);
-      res.status(200).json({ status: "success", data: { menuItem } });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { menuItems },
+    });
+  },
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { menuId } = req.params;
-      const ownerId = req.user?.userId;
-      const menuItem = await this.menuItemsService.createMenuItem(menuId, ownerId, req.body);
-      res.status(201).json({ status: "success", data: { menuItem } });
-    } catch (error) {
-      next(error);
-    }
-  };
+  getById: async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+    const menuItem = await menuItemsService.getById(id);
 
-  update = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const ownerId = req.user?.userId;
-      const menuItem = await this.menuItemsService.updateMenuItem(id, ownerId, req.body);
-      res.status(200).json({ status: "success", data: { menuItem } });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { menuItem },
+    });
+  },
 
-  delete = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const ownerId = req.user?.userId;
-      await this.menuItemsService.deleteMenuItem(id, ownerId);
-      res.status(204).send();
-    } catch (error) {
-      next(error);
-    }
-  };
-}
+  create: async (req: Request, res: Response, _next: NextFunction) => {
+    const data: CreateMenuItemRequest = req.body;
+    const menuItem = await menuItemsService.create(data);
+
+    res.status(HTTP_STATUS_CREATED).json({
+      success: true,
+      data: { menuItem },
+    });
+  },
+
+  update: async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+    const data: UpdateMenuItemRequest = req.body;
+    const menuItem = await menuItemsService.update(id, data);
+
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { menuItem },
+    });
+  },
+
+  delete: async (req: Request, res: Response, _next: NextFunction) => {
+    const { id } = req.params;
+    await menuItemsService.delete(id);
+
+    res.status(HTTP_STATUS_NO_CONTENT).send();
+  },
+};

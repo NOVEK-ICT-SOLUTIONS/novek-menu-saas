@@ -27,8 +27,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       toast.success("Account created successfully!");
       navigate("/dashboard");
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
-      toast.error(err.response?.data?.message || "Registration failed");
+      const err = error as { response?: { data?: { error?: { message?: string } } } };
+      toast.error(err.response?.data?.error?.message || "Registration failed");
     } finally {
       setLoading(false);
     }

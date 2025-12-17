@@ -1,60 +1,45 @@
-import type { AuthService } from "@modules/auth/auth.service";
-import type { LoginRequest, RefreshTokenRequest, RegisterRequest } from "@modules/auth/auth.types";
 import type { NextFunction, Request, Response } from "express";
+import { authService } from "./auth.service.ts";
+import type { LoginRequest, RefreshTokenRequest, RegisterRequest } from "./auth.types.ts";
 
-export class AuthController {
-  constructor(private authService: AuthService) {}
+const HTTP_STATUS_CREATED = 201;
+const HTTP_STATUS_OK = 200;
 
-  register = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const data: RegisterRequest = req.body;
-      const result = await this.authService.register(data);
+export const authController = {
+  register: async (req: Request, res: Response, _next: NextFunction) => {
+    const data: RegisterRequest = req.body;
+    const result = await authService.register(data);
 
-      res.status(201).json({
-        status: "success",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_CREATED).json({
+      success: true,
+      data: result,
+    });
+  },
 
-  login = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const data: LoginRequest = req.body;
-      const result = await this.authService.login(data);
+  login: async (req: Request, res: Response, _next: NextFunction) => {
+    const data: LoginRequest = req.body;
+    const result = await authService.login(data);
 
-      res.status(200).json({
-        status: "success",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: result,
+    });
+  },
 
-  refresh = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { refreshToken }: RefreshTokenRequest = req.body;
-      const result = await this.authService.refreshAccessToken(refreshToken);
+  refresh: async (req: Request, res: Response, _next: NextFunction) => {
+    const { refreshToken }: RefreshTokenRequest = req.body;
+    const result = await authService.refreshAccessToken(refreshToken);
 
-      res.status(200).json({
-        status: "success",
-        data: result,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: result,
+    });
+  },
 
-  logout = async (_req: Request, res: Response, next: NextFunction) => {
-    try {
-      res.status(200).json({
-        status: "success",
-        message: "Logged out successfully",
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-}
+  logout: async (_req: Request, res: Response, _next: NextFunction) => {
+    res.status(HTTP_STATUS_OK).json({
+      success: true,
+      data: { message: "Logged out successfully" },
+    });
+  },
+};

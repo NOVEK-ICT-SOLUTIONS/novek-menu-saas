@@ -25,39 +25,10 @@ NEVER scan files matching the following directory/file patterns:
 
 ## GENERAL CODE RULES
 
-- ALWAYS use `underscore_case` for filenames.
 - NEVER insert emoji into any file.  Use unicode codepoints instead.
 - ALWAYS respect the ignored file patterns in the `.gitignore` file.
 - NEVER allow a git branch or Github pull request to contain more than 40 changed files.  If it does, do not do any work, and instruct the developer to split the changes into smaller branches.
 
-## PYTHON RULES
-
-- ALWAYS use absolute imports.
-- ALWAYS respect the Ruff linter rules in `ruff.toml`.
-- ALWAYS respect the Pyright rules in `pyrightconfig.json`.
-- NEVER allow new entries to be added to a `.basedpyright/baseline.json` file.
-- ALWAYS use `uv` to manage the project and package dependencies.
-- ALWAYS use `ruff` to lint the code.
-- ALWAYS use `pyright` to type check the code.
-- ALWAYS import modules at the top of the file.
-- NEVER import modules from within a function or class.
-- NEVER use the `Any` static type.
-- NEVER use the `dict[..., ...]` or `typing.Dict[..., ...]` static type.  Use the `TypedDict` static type instead.
-- ALWAYS add a `typing.TypedDict` type definition to all dictionaries.
-- NEVER use the `typing.Tuple[...]` static type.  Use the `tuple[]` static type instead.
-- NEVER add `print()` statements.
-- NEVER use the `object` static type.  Always specify a specific ABC abstract base class or `class` static type.
-- ALWAYS use the `Final` static type for all variables.  Rename it to `Fin`.
-- NEVER add return type annotations to functions, unless they are recursive or type stubs.
-- NEVER use try/catch.
-- ALWAYS prefer a functional style of code.
-- ALWAYS avoid using mutatable state.
-- ALWAYS avoid using mutable variables.
-- NEVER insert emoji into code.  Use unicode codepoints instead.
-- NEVER add code comments, unless specifically requested.
-- NEVER conditionally import types modules with the `if TYPE_CHECKING:` statement.
-- NEVER allow a Python file to be larger than 600 lines of code.
-- NEVER allow a Python function to be larger than 100 lines of code.
 
 ## TYPESCRIPT AND JAVASCRIPT RULES
 
@@ -68,7 +39,6 @@ NEVER scan files matching the following directory/file patterns:
 - ALWAYS Respect the typescript configs in the `tsconfig.json` files.
 - ALWAYS specify exact package versions in `package.json`.
 - NEVER add unnecessary `console.log()` statements.
-- ALWAYS use the absolute path alias with the `#` prefix for imports.
 - NEVER use relative paths for imports.
 - ALWAYS use the file extension for import paths.
 - NEVER add an explicit type to a variable if it can be inferred.
@@ -119,3 +89,18 @@ NEVER scan files matching the following directory/file patterns:
 - ALWAYS use a `UUID` for primary keys.
 - NEVER use an integer for primary keys.
 - NEVER specify schema names in SQL statements (Example: `public`).
+
+## MODULE AND EXPORT RULES
+
+- NEVER use `.js` extension in import paths. ALWAYS use `.ts` extension.
+- NEVER create `index.ts` barrel files if the folder contains less than 3 files. Import directly from the file instead.
+- ALWAYS import directly from the source file when possible.
+
+## MAGIC NUMBERS AND CONSTANTS
+
+- NEVER use magic numbers in code. ALWAYS define them as named constants.
+- ALWAYS use descriptive constant names that explain the purpose.
+- ALWAYS group related constants in a constants file or at the top of the file.
+- Examples:
+  - BAD: `if (attempts > 5)` or `setTimeout(fn, 300000)`
+  - GOOD: `if (attempts > MAX_LOGIN_ATTEMPTS)` or `setTimeout(fn, CACHE_TTL_MS)`

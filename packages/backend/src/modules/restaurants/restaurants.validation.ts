@@ -1,33 +1,29 @@
 import { z } from "zod";
+import { commonSchemas } from "../../core/validation/schemas.ts";
+
+const MAX_LOCATION_LENGTH = 255;
 
 export const createRestaurantSchema = z.object({
-  name: z.string().min(1, "Restaurant name is required").max(100, "Name too long"),
-  slug: z
-    .string()
-    .min(1, "Slug is required")
-    .max(100, "Slug too long")
-    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens"),
+  name: commonSchemas.name,
+  slug: commonSchemas.slug,
 });
 
 export const updateRestaurantSchema = z.object({
-  name: z.string().min(1, "Restaurant name is required").max(100, "Name too long").optional(),
-  slug: z
-    .string()
-    .min(1, "Slug is required")
-    .max(100, "Slug too long")
-    .regex(/^[a-z0-9-]+$/, "Slug must contain only lowercase letters, numbers, and hyphens")
-    .optional(),
-  location: z.string().max(255, "Location too long").optional(),
-  contactEmail: z.string().email("Invalid email").optional(),
-  contactPhone: z.string().max(50, "Phone number too long").optional(),
-  primaryColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format (use #RRGGBB)")
-    .optional(),
-  backgroundColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/, "Invalid color format (use #RRGGBB)")
-    .optional(),
-  logoUrl: z.string().url("Invalid URL").optional(),
-  headerImageUrl: z.string().url("Invalid URL").optional(),
+  name: commonSchemas.name.optional(),
+  slug: commonSchemas.slug.optional(),
+  location: z.string().max(MAX_LOCATION_LENGTH, "Location too long").trim().optional().or(z.literal("")),
+  contactEmail: commonSchemas.email.optional().or(z.literal("")),
+  contactPhone: commonSchemas.phone,
+  primaryColor: commonSchemas.hexColor.optional(),
+  backgroundColor: commonSchemas.hexColor.optional(),
+  logoUrl: commonSchemas.url,
+  headerImageUrl: commonSchemas.url,
+});
+
+export const restaurantIdParamSchema = z.object({
+  id: commonSchemas.id,
+});
+
+export const restaurantSlugParamSchema = z.object({
+  slug: commonSchemas.slug,
 });
