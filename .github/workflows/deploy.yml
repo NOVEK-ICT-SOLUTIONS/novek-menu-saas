@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository }}
+  IMAGE_PREFIX: novek-ict-solutions/novek-menu-saas
 
 jobs:
   build-and-push:
