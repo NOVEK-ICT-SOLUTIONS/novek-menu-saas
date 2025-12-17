@@ -1,8 +1,8 @@
-import { randomUUID } from "crypto";
-import { existsSync, mkdirSync } from "fs";
-import { unlink } from "fs/promises";
+import { randomUUID } from "node:crypto";
+import { existsSync, mkdirSync } from "node:fs";
+import { unlink } from "node:fs/promises";
+import path from "node:path";
 import multer from "multer";
-import path from "path";
 
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const MAX_FILE_SIZE_MB = 2;

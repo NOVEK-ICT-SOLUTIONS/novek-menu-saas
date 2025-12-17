@@ -55,7 +55,8 @@
       "enabled": true
     },
     "parser": {
-      "cssModules": true
+      "cssModules": true,
+      "tailwindDirectives": true
     }
   },
   "linter": {
@@ -63,6 +64,7 @@
     "rules": {
       "style": {
         "noDefaultExport": "off",
+        "noNonNullAssertion": "off",
         "useNamingConvention": {
           "options": {
             "strictCase": false,

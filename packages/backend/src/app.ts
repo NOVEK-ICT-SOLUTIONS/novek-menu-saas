@@ -1,9 +1,9 @@
+import path from "node:path";
 import compression from "compression";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 import morgan from "morgan";
-import path from "path";
 import { v1Router } from "./api/v1/router.ts";
 import { errorMiddleware } from "./core/middleware/error.middleware.ts";
 import { apiRateLimiter } from "./core/middleware/rate-limit.middleware.ts";

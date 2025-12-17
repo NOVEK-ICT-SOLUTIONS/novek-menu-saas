@@ -1,7 +1,6 @@
 import React from "react";
 import { MdAdd, MdArrowBack, MdCategory, MdDelete } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
