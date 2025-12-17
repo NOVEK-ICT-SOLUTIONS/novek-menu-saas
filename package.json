@@ -20,7 +20,12 @@
     "db:studio": "npm run db:studio -w backend",
     "db:seed": "npm run db:seed -w backend",
     "db:reset": "npm run db:reset -w backend",
-    "clean": "npm run clean --workspaces"
+    "clean": "npm run clean --workspaces",
+    "docker:build": "docker compose -f docker-compose.local.yml build",
+    "docker:up": "docker compose -f docker-compose.local.yml up -d",
+    "docker:down": "docker compose -f docker-compose.local.yml down",
+    "docker:logs": "docker compose -f docker-compose.local.yml logs -f",
+    "docker:migrate": "docker compose -f docker-compose.local.yml exec backend npx prisma migrate deploy"
   },
   "devDependencies": {
     "concurrently": "latest"

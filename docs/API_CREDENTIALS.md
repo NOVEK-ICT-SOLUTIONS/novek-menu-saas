@@ -8,7 +8,7 @@
 - **Role:** `OWNER`
 
 ### Admin User
-- **Email:** `admin@example.com`
+- **Email:** `admin@novektech.com`
 - **Password:** `Admin123@`
 - **Role:** `ADMIN`
 

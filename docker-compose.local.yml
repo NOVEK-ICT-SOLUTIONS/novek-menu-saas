@@ -1,0 +1,61 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
+      args:
+        VITE_API_URL: http://localhost:3000/api/v1
+        VITE_PUBLIC_URL: http://localhost:8080
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - menu-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://menu_user:menu_password@db:5432/menu_saas
+      JWT_SECRET: local-dev-jwt-secret-min-32-characters-long
+      JWT_REFRESH_SECRET: local-dev-refresh-secret-min-32-characters-long
+      CORS_ORIGIN: http://localhost:8080
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - menu-network
+
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: menu_user
+      POSTGRES_PASSWORD: menu_password
+      POSTGRES_DB: menu_saas
+    volumes:
+      - postgres_data_local:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U menu_user -d menu_saas"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - menu-network
+
+volumes:
+  postgres_data_local:
+  uploads:
+
+networks:
+  menu-network:
+    driver: bridge
