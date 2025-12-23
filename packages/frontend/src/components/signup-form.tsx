@@ -64,7 +64,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
-              <FieldDescription>Must be at least 8 characters long.</FieldDescription>
+              <FieldDescription>Min 8 chars with uppercase, lowercase, number, and special character.</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="confirm-password">Confirm Password</FieldLabel>
